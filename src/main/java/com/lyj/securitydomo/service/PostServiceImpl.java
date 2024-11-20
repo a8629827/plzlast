@@ -80,7 +80,7 @@ public class PostServiceImpl implements PostService {
                 .thumbnailLink(getThumbnailLink(post)) // 썸네일 링크
                 .requiredParticipants(post.getRequiredParticipants()) // 모집 인원
                 .status(post.getStatus() != null ? post.getStatus().name() : null) // 모집 상태
-                .author(post.getUser() != null ? post.getUser().getUsername() : null) // 작성자
+                .author(post.getAuthor() != null ? post.getAuthor().getUsername() : null) // 작성자
                 .reportCount(post.getReportCount()) // 신고 횟수
                 .lat(post.getLat()) // 위도
                 .lng(post.getLng()) // 경도
@@ -129,7 +129,7 @@ public class PostServiceImpl implements PostService {
         Post post = Post.builder()
                 .title(postDTO.getTitle())
                 .contentText(postDTO.getContentText())
-                .user(user)
+                .author(user)
                 .requiredParticipants(postDTO.getRequiredParticipants())
                 .status(postDTO.getStatus() != null ? Post.Status.valueOf(postDTO.getStatus()) : Post.Status.모집중)
                 .lat(postDTO.getLat())
@@ -203,7 +203,7 @@ public class PostServiceImpl implements PostService {
 
         // 작성자 검증
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!post.getUser().getUsername().equals(currentUsername)) {
+        if (!post.getAuthor().getUsername().equals(currentUsername)) {
             throw new IllegalStateException("작성자만 게시글을 수정할 수 있습니다.");
         }
 

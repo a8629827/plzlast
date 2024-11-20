@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/basic.html}">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 상세보기</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="content" class="container mt-5">
+  <!-- 썸네일 이미지와 상단 버튼 영역 -->
+  <div class="text-center">
+    <img th:src="${post.thumbnail}" class="img-fluid mb-3" alt="썸네일 이미지" style="max-width: 300px; height: auto;">
+    <div class="mt-3">
+      <!-- 수정 및 삭제 버튼 (작성자에게만 표시) -->
+      <div th:if="${isAuthor}">
+        <a th:href="@{/posting/modify/{postId}(postId=${post.postId})}" class="btn btn-secondary me-2">수정하기</a>
+        <button class="btn btn-outline-danger me-2" onclick="deletePost('[[${post.postId}]]')">삭제하기</button>
+      </div>
+      <!-- 목록으로 돌아가기 버튼 -->
+      <a th:href="@{/posting/list}" class="btn btn-dark">목록으로 돌아가기</a>
+
+    </div>
+  </div>
+
+  <!-- 이미지 및 글 내용 영역 -->
+  <div class="mt-5">
+    <!-- 여러 장의 이미지 출력 -->
+    <div class="d-flex flex-wrap justify-content-center">
+      <div th:each="image : ${originalImages}" class="p-2">
+        <img th:src="${image}" class="img-thumbnail" style="width: 150px; height: auto;" alt="원본 이미지">
+      </div>
+    </div>
+
+    <!-- 게시글 내용 -->
+    <div class="mt-4">
+      <h3 th:text="${post.title}">게시글 제목</h3>
+      <p class="text-muted" th:text="'작성자: ' + ${post.author}"></p>
+      <p class="text-muted" th:text="'등록일: ' + ${#dates.format(post.createdAt, 'yyyy-MM-dd HH:mm')}"></p>
+      <p th:text="${post.contentText}">게시글 본문 내용</p>
+    </div>
+  </div>
+  <!-- 지도 표시 영역 -->
+  <h4>모임 장소</h4>
+  <div id="map" style="width: 50%; height: 400px;"></div>
+
+  <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=9n21s23li1"></script>
+  <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps-geocoder.js?ncpClientId=9n21s23li1"></script>
+</div>
+
+<!-- 신청자 리스트 -->
+<div class="mt-5">
+  <h4>신청자 목록</h4>
+  <ul class="list-group">
+    <!--/" <li th:each="applicant : ${applicants}" class="list-group-item">
+         <span th:text="${applicant.name}">신청자 이름</span>
+         <span class="text-muted" th:text="' - 신청일: ' + ${#dates.format(applicant.appliedAt, 'yyyy-MM-dd HH:mm')}"></span>
+     </li>"/-->
+  </ul>
+</div>
+
+
+<script th:inline="javascript">
+  const lat = '[[${post.lat}]]';
+  const lng = '[[${post.lng}]]';  // lng 값을 Thymeleaf 변수에서 가져오기
+
+  var map;
+
+  function initializeMap() {
+    map = new naver.maps.Map("map", {
+      center: new naver.maps.LatLng(lat, lng),
+      zoom: 12,
+    });
+
+    var marker = new naver.maps.Marker({
+      position: new naver.maps.LatLng(lat, lng),
+      map: map
+    });
+  }
+
+  naver.maps.onJSContentLoaded = initializeMap; // 지도가 로드된 후 초기화 함수 호출
+  <!-- 삭제 기능 스크립트 -->
+  function deletePost(postId) {
+    if (confirm("정말로 이 글을 삭제하시겠습니까?")) {
+      fetch('/posting/remove/' + postId, {
+        method: 'DELETE'
+      })
+              .then(response => {
+                if (!response.ok) throw new Error("게시글 삭제 실패");
+                alert("게시글이 삭제되었습니다.");
+                window.location.href = '/posting/list'; // 삭제 후 목록 페이지로 이동
+              })
+              .catch(error => {
+                console.error("Error:", error);
+                alert("게시글 삭제에 실패했습니다.");
+              });
+    }
+  }
+
+</script>
+
+</div>
+</body>
+</html>

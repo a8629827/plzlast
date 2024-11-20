@@ -15,10 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.modelmapper.ModelMapper;
 
@@ -163,5 +160,17 @@ public class UserController {
         model.addAttribute("currentPage", responseDTO.getPage()); //
         model.addAttribute("user", principal.getUser());
         return "/user/mywriting";
+    }
+    /**
+     * 게시글 읽기 및 수정 페이지를 보여주는 메서드
+     */
+    @GetMapping("/readwriting/{postId}")
+    public String read(@PathVariable Long postId, Model model) {
+        PostDTO postDTO = postService.readOne(postId);
+        log.info(postDTO);
+        model.addAttribute("post", postDTO);
+        model.addAttribute("originalImages", postDTO.getOriginalImageLinks()); // 이미지 링크 추가
+        model.addAttribute("isAuthor", true); // 작성자인 경우
+        return "/user/readwriting"; // 상세보기 페이지
     }
 }

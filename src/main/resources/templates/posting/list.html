@@ -6,21 +6,7 @@
   <meta charset="UTF-8">
   <title>게시글 목록</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #f8f9fa;
-    }
-    .modal-header {
-      background-color: #007bff;
-      color: white;
-    }
-    .card-img-top {
-      width: 100%;
-      height: auto;
-      max-height: 200px;
-      object-fit: cover;
-    }
-  </style>
+  <!-- custom 스타일 파일 연결 -->
 </head>
 
 <body>
@@ -57,8 +43,8 @@
   <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">
       <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-        <div class="col mb-5" th:each="post : ${posts}">
-          <div class="card h-100">
+        <div class="col mb-5" th:each="post, iterStat : ${posts}">
+          <div class="card h-100" th:classappend="${isAuthor[iterStat.index] ? 'border-primary' : ''}">
             <a th:href="@{/posting/read/{postId}(postId=${post.postId})}" class="text-decoration-none">
               <img class="card-img-top img-thumbnail" th:src="@{${post.getThumbnail()}}" alt="이미지"/>
             </a>
@@ -68,23 +54,30 @@
                 <p th:text="'작성자: ' + ${post.author}"></p>
                 <p th:text="'모집 상태: ' + ${post.status}"></p>
                 <p th:text="'모집 인원: ' + ${post.requiredParticipants} + '명'"></p>
-              </div>
+                <!-- 작성자 본인 글 표시 -->
+                <div th:if="${isAuthor[iterStat.index]}" class="badge text-white position-absolute bottom-0 start-50 translate-middle-x mb-3"
+                     style="background-color: #6c757d; padding: 0.5rem 1rem; border-radius: 15px;">
+                  내가 작성한 글
+                </div>              </div>
             </div>
             <!-- 게시글 목록 카드 부분 수정 -->
             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
               <div class="text-center" th:attr="data-post-id=${post.postId}">
-                <!-- 일반 사용자에게만 신고하기 버튼을 표시 (관리자에게는 숨김) -->
-                <button type="button" class="btn btn-outline-danger mt-auto" data-bs-toggle="modal" data-bs-target="#reportModal"
-                        th:if="${!isAdmin}">
+                <!-- 신고하기 버튼 (오른쪽 아래에 배치) -->
+                <button type="button" class="btn btn-outline-danger btn-sm mt-auto position-absolute bottom-0 end-0 me-3 mb-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#reportModal"
+                        th:if="${!isAdmin && !isAuthor[iterStat.index]}">
                   신고하기
                 </button>
-
                 <!-- 관리자에게만 신고 건수를 표시 (일반 사용자에게는 숨김) -->
                 <div th:if="${isAdmin}" th:text="'신고 건수: ' + ${post.reportCount} + '건'"></div>
 
-                <!-- 신청하기 버튼 (모든 사용자에게 표시) -->
-                <button type="button" class="btn btn-primary apply-button mt-auto" data-bs-toggle="modal" data-bs-target="#applyModal"
-                        data-post-id="${post.postId}">
+                <!-- 신청하기 버튼 (가운데 아래에 배치) -->
+                <button type="button" class="btn btn-primary btn-sm mt-auto position-absolute bottom-0 start-50 translate-middle-x mb-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#applyModal"
+                        th:if="${!isAuthor[iterStat.index]}">
                   신청하기
                 </button>
               </div>
@@ -172,6 +165,13 @@
           const category = document.getElementById('category').value;
           const reason = document.getElementById('reason').value;
 
+          if (!category || !reason.trim()) {
+            alert('신고 유형과 사유를 입력해주세요.');
+            return;
+          }
+
+          console.log('신고하기 요청 - postId:', postId, '카테고리:', category, '사유:', reason);
+
           fetch('/report/create', {
             method: 'POST',
             headers: {
@@ -180,52 +180,85 @@
             body: JSON.stringify({ postId: postId, category: category, reason: reason }),
           })
                   .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
+                    console.log('신고 응답 상태 코드:', response.status);
+                    if (!response.ok) throw new Error('신고 요청 실패');
                     return response.text();
                   })
                   .then(data => {
+                    console.log('신고 응답 데이터:', data);
                     alert(data);
                     bootstrap.Modal.getInstance(document.getElementById('reportModal')).hide();
                   })
                   .catch(error => {
-                    console.error('Error:', error);
+                    console.error('신고 실패:', error.message);
                     alert('신고에 실패했습니다. 다시 시도해 주세요.');
                   });
         };
       });
 
-      // 신청하기 버튼 이벤트
-      document.querySelectorAll('.apply-button').forEach(button => {
+      // 모달이 닫힐 때 입력 필드 초기화 (신고하기)
+      document.getElementById('reportModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('category').value = ''; // 신고 카테고리 초기화
+        document.getElementById('reason').value = ''; // 신고 사유 초기화
+      });
+
+      // 신청하기 버튼 클릭 시 postId 설정
+      document.querySelectorAll('.btn-primary[data-bs-target="#applyModal"]').forEach(button => {
         button.addEventListener('click', function () {
-          const postId = this.getAttribute('data-post-id');
+          const postId = this.closest('.text-center').getAttribute('data-post-id');
+          console.log('모달 열기 - postId:', postId);
+
+          // 모달의 신청하기 버튼에 postId 설정
           document.getElementById('submitApplication').setAttribute('data-post-id', postId);
         });
       });
 
       // 신청하기 모달에서 신청하기 버튼 클릭 이벤트
       document.getElementById('submitApplication').addEventListener('click', function () {
-        const postId = this.getAttribute('data-post-id');
-        const applicationReason = document.getElementById('applicationReason').value;
+        const postId = parseInt(this.getAttribute('data-post-id'), 10);
+        const applicationReason = document.getElementById('applicationReason').value.trim();
+
+        if (!applicationReason) {
+          alert('신청 사유를 입력해주세요.');
+          return;
+        }
+
+        console.log('신청하기 요청 - postId:', postId, '신청 이유:', applicationReason);
 
         fetch('/request/create', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ postId: postId, title: "신청 제목", contentText: applicationReason }),
+          body: JSON.stringify({
+            postId: postId,
+            contentText: applicationReason,
+          }),
         })
                 .then(response => {
-                  if (!response.ok) throw new Error('신청에 실패했습니다.');
+                  console.log('신청 응답 상태 코드:', response.status);
+                  if (!response.ok) {
+                    return response.text().then(err => {
+                      console.error('신청 실패:', err);
+                      throw new Error(err);
+                    });
+                  }
                   return response.text();
                 })
                 .then(data => {
-                  alert("신청이 완료되었습니다.");
+                  console.log('신청 응답 데이터:', data);
+                  alert('신청이 완료되었습니다.');
                   bootstrap.Modal.getInstance(document.getElementById('applyModal')).hide();
                 })
                 .catch(error => {
-                  console.error('Error:', error);
-                  alert('신청에 실패했습니다11.');
+                  console.error('신청 실패:', error.message);
+                  alert('신청에 실패했습니다. 이유: ' + error.message);
                 });
+      });
+
+      // 모달 닫힐 때 입력 필드 초기화 (신청하기)
+      document.getElementById('applyModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('applicationReason').value = ''; // 입력 필드 초기화
       });
     });
   </script>

@@ -34,6 +34,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import lombok.extern.log4j.Log4j2;
 
 @Controller
@@ -52,6 +54,7 @@ public class PostController {
      */
     @GetMapping("/list")
     public String list(PageRequestDTO pageRequestDTO, Model model, @AuthenticationPrincipal PrincipalDetails principal) {
+
         // 기본 페이지 크기 설정
         if (pageRequestDTO.getSize() <= 0) {
             pageRequestDTO.setSize(10);
@@ -63,6 +66,15 @@ public class PostController {
         // 사용자 역할(관리자 여부) 확인
         boolean isAdmin = principal != null && principal.getUser().getRole().equals("ADMIN");
         model.addAttribute("isAdmin", isAdmin);
+
+
+
+        // 각 게시글에 대해 작성자인지 확인 (isAuthor 메서드)
+        if (principal != null) {
+            model.addAttribute("isAuthor", responseDTO.getDtoList().stream()
+                    .map(postDTO -> postDTO.getAuthor().equals(principal.getUser().getUsername())) // 작성자 여부 확인
+                    .collect(Collectors.toList()));
+        }
 
         // 데이터 전달
         model.addAttribute("posts", responseDTO.getDtoList());
@@ -82,9 +94,18 @@ public class PostController {
         model.addAttribute("post", postDTO);
         model.addAttribute("originalImages", postDTO.getOriginalImageLinks());
 
+        // 로그인한 사용자 정보 추가
+        if (principal != null) {
+            model.addAttribute("user", principal.getUser());
+        }
+
         // 관리자 여부 확인
         boolean isAdmin = principal != null && principal.getUser().getRole().equals("ADMIN");
         model.addAttribute("isAdmin", isAdmin);
+
+        // 작성자 여부 확인
+        boolean isAuthor = principal != null && postDTO.getAuthor().equals(principal.getUser().getUsername());
+        model.addAttribute("isAuthor", isAuthor);
 
         log.info("게시글 상세 정보: {}", postDTO);
         return "posting/read";

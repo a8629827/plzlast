@@ -33,6 +33,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostSearch {
     // isVisible == true인 게시글만 조회
     Page<Post> findByIsVisibleTrue(Pageable pageable);
 
-    @Query("select p from Post p where p.user.username=:username")
+    @Query("select p from Post p where p.author.username=:username")
     Page<Post> findByUsername(@Param("username") String username, Pageable pageable);
 }

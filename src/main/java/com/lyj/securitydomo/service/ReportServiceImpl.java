@@ -2,13 +2,16 @@ package com.lyj.securitydomo.service;
 
 import com.lyj.securitydomo.domain.Post;
 import com.lyj.securitydomo.domain.Report;
+import com.lyj.securitydomo.domain.User;
 import com.lyj.securitydomo.dto.ReportDTO;
 import com.lyj.securitydomo.repository.ReportRepository;
 import com.lyj.securitydomo.repository.PostRepository;
+import com.lyj.securitydomo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,8 @@ public class ReportServiceImpl implements ReportService {
     private final ReportRepository reportRepository; // ReportRepository 의존성 주입
     private final PostRepository postRepository; // PostRepository 의존성 주입
     private final ModelMapper modelMapper; // Entity-DTO 간 변환을 위한 ModelMapper 의존성 주입
+    private final UserRepository userRepository;
+
 
     /**
      * 새로운 신고를 생성하고 저장하는 메서드
@@ -32,24 +37,36 @@ public class ReportServiceImpl implements ReportService {
      */
     @Override
     public void createReport(ReportDTO reportDTO) {
-        log.info("신고 생성 요청: postId={}, category={}, reason={}", reportDTO.getPostId(), reportDTO.getCategory(), reportDTO.getReason());
+        log.info("신고 생성 요청: postId={}, userId={}, category={}, reason={}",
+                reportDTO.getPostId(), reportDTO.getUserId(), reportDTO.getCategory(), reportDTO.getReason());
 
-        // 신고할 게시글(Post)을 조회
+        // 게시글 조회
         Post post = postRepository.findById(reportDTO.getPostId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다."));
 
-        // Report 엔티티 생성 및 초기화
+        // 사용자 조회
+        User user = userRepository.findById(reportDTO.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+
+        // 중복 신고 방지
+        boolean isDuplicate = reportRepository.existsByPostAndUser(post, user);
+        if (isDuplicate) {
+            throw new IllegalStateException("이미 해당 게시글을 신고하셨습니다.");
+        }
+
+        // 신고 엔티티 생성 및 저장
         Report report = Report.builder()
-                .post(post) // 신고할 게시글 설정
-                .category(Report.ReportCategory.valueOf(reportDTO.getCategory().toUpperCase())) // 신고 카테고리 설정
-                .reason(reportDTO.getReason()) // 신고 사유 설정
-                .status(Report.ReportStatus.PENDING) // 초기 상태를 PENDING으로 설정
-                .createdAt(new Date()) // 생성 날짜 설정
+                .post(post)
+                .user(user)
+                .category(Report.ReportCategory.valueOf(reportDTO.getCategory().toUpperCase()))
+                .reason(reportDTO.getReason())
+                .status(Report.ReportStatus.PENDING)
+                .createdAt(new Date())
                 .build();
 
-        // 생성된 Report 엔티티를 데이터베이스에 저장
         reportRepository.save(report);
-        log.info("신고가 데이터베이스에 저장되었습니다: {}", report);
+        log.info("신고가 저장되었습니다: {}", report);
     }
 
     /**

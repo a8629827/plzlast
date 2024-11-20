@@ -56,9 +56,7 @@
                         <li sec:authorize="isAuthenticated()" class="nav-item">
                             <a class="nav-link" href="/posting/register"><i class="bi bi-pencil-square"></i> 모임등록하기</a>
                         </li>
-                        <li sec:authorize="hasAnyAuthority('USER')" class="nav-item">
-                            <a class="nav-link" href="/User"><i class="bi bi-person-fill"></i> User</a>
-                        </li>
+
 
                         <!-- 관리자 드롭다운 메뉴 - 마우스 오버 시 드롭다운 표시 -->
                         <li sec:authorize="hasAnyAuthority('ADMIN')" class="nav-item dropdown">
@@ -79,9 +77,10 @@
                                 <i class="bi bi-person-circle"></i> 마이페이지
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="myPageDropdown">
-                                <li><a class="dropdown-item" href="/user/myPosts"><i class="bi bi-journal-text"></i> 나의 모임</a></li>
+                                <li><a class="dropdown-item" href="/user/mywriting"><i class="bi bi-journal-text"></i> 나의 모임</a></li>
                                 <li><a class="dropdown-item" href="/user/myapp"><i class="bi bi-list-check"></i> 신청 목록</a></li>
                                 <li><a class="dropdown-item" href="/user/mypage"><i class="bi bi-pencil-square"></i> 내 정보 수정</a></li>
+                                <li><a class="dropdown-item" href="/user/readmypage"><i class="bi bi-pencil-square"></i> 내 정보 보기</a></li>
                             </ul>
                         </li>
                     </ul>

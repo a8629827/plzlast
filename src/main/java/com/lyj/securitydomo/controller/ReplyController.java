@@ -23,6 +23,7 @@ public class ReplyController {
 
     @PostMapping("/{postId}")
     public ResponseEntity<ReplyDTO> createReply(@PathVariable Long postId, @RequestBody ReplyDTO replyDTO) {
+        log.info("댓글 등록 요청: postId={}, replyDTO={}", postId, replyDTO);
         replyService.createReply(postId, replyDTO);
         return ResponseEntity.ok(replyDTO);
     }

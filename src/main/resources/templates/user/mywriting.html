@@ -50,9 +50,9 @@
             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
               <div class="text-center">
                 <a class="btn btn-outline-primary mt-auto"
-                   th:href="@{/posting/edit/{postId}(postId=${post.postId})}">수정</a>
+                   th:href="@{/posting/modify/{postId}(postId=${post.postId})}">수정</a>
                 <button type="button" class="btn btn-outline-danger mt-auto"
-                        onclick="deletePost([[${post.postId}]])">삭제</button>
+                        onclick="deletePost('[[${post.postId}]]')">삭제</button>
               </div>
             </div>
           </div>
@@ -65,8 +65,8 @@
   <script>
     function deletePost(postId) {
       if (confirm("정말로 이 글을 삭제하시겠습니까?")) {
-        fetch(`/posting/delete/${postId}`, {
-          method: 'DELETE'
+        fetch(`/posting/remove/${postId}`, {
+          method: 'REMOVE'
         })
                 .then(response => {
                   if (!response.ok) throw new Error("게시글 삭제 실패");

@@ -21,5 +21,6 @@ public class ReportDTO {
     private String postTitle;//게시글 제목
     private int reportCount; // 신고 횟수
     private boolean isVisible; // 게시글의 공개/비공개 상태 (관리자용)
+    private Long userId;       // 신고를 생성한 사용자 ID
 
 }

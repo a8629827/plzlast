@@ -3,6 +3,8 @@ package com.lyj.securitydomo.controller;
 import com.lyj.securitydomo.dto.RequestDTO;
 import com.lyj.securitydomo.service.RequestService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/request")
+@Log4j2
 public class RequestController {
 
     private final RequestService requestService;
@@ -23,17 +26,39 @@ public class RequestController {
 
     /**
      * 새로운 요청을 저장합니다.
+     *
      * @param requestDTO 저장할 요청의 정보를 담은 DTO
      * @return 성공 메시지 또는 오류 메시지를 포함한 ResponseEntity
      */
     @PostMapping("/create")
     public ResponseEntity<String> createRequest(@RequestBody RequestDTO requestDTO) {
+        log.info("새로운 요청 생성 시도: {}", requestDTO);
+
         try {
+            // 요청 필수 데이터 검증 (예: postId와 content 확인)
+            if (requestDTO.getPostId() == null || requestDTO.getPostId() <= 0) {
+                log.error("유효하지 않은 게시글 ID: {}", requestDTO.getPostId());
+                return ResponseEntity.badRequest().body("유효하지 않은 게시글 ID입니다.");
+            }
+
+            if (requestDTO.getContentText() == null || requestDTO.getContentText().trim().isEmpty()) {
+                log.error("신청 사유가 비어 있습니다.");
+                return ResponseEntity.badRequest().body("신청 사유를 입력해주세요.");
+            }
+
             // RequestService를 통해 요청 저장
             requestService.createRequest(requestDTO);
+            log.info("신청이 성공적으로 처리되었습니다. 게시글 ID: {}", requestDTO.getPostId(), requestDTO.getContentText());
+
             return ResponseEntity.ok("신청이 완료되었습니다.");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            log.error("신청 처리 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.badRequest().body("신청 처리 중 오류가 발생했습니다: " + e.getMessage());
+        } catch (Exception e) {
+            // 기타 서버 오류 발생
+            log.error("서버 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("이미 신청한 게시글입니다.");
         }
     }
 

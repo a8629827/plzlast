@@ -23,6 +23,10 @@ public class Report {
     @JoinColumn(name = "postId")
     private Post post;  // 신고 대상 게시글
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false) // 신고자는 반드시 있어야 함
+    private User user;
+
     @Enumerated(EnumType.STRING) // 문자열로 저장
     @Column(nullable = false)
     private ReportCategory category;  // 신고 분류 열거형 (SPAM, ABUSE 등)
@@ -68,6 +72,7 @@ public class Report {
                 ", status=" + status +
                 ", createdAt=" + createdAt +
                 ", isVisible=" + isVisible +
+                ", user=" + (user != null ? user.getUsername() : "null") + // 유저 정보 추가
                 '}';
     }
 }

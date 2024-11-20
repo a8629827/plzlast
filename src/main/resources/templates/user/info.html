@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/basic.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>내 정보</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .info-group {
+            margin-bottom: 15px;
+        }
+        .info-label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <h3>내 정보</h3>
+        <div class="info-group">
+            <span class="info-label">이름:</span>
+            <span th:text="${user.name}"></span>
+        </div>
+        <div class="info-group">
+            <span class="info-label">아이디:</span>
+            <span th:text="${user.username}"></span>
+        </div>
+        <div class="info-group">
+            <span class="info-label">이메일:</span>
+            <span th:text="${user.email}"></span>
+        </div>
+        <div class="info-group">
+            <span class="info-label">생년월일:</span>
+            <span th:text="${user.birthDate}"></span>
+        </div>
+        <div class="info-group">
+            <span class="info-label">성별:</span>
+            <span th:text="${user.gender}"></span>
+        </div>
+        <div class="info-group">
+            <span class="info-label">주소:</span>
+            <span th:text="${user.city}"></span>,
+            <span th:text="${user.state}"></span>
+        </div>
+        <!-- 수정 페이지로 이동 버튼 -->
+        <div class="form-group mt-4 text-center">
+
+            <button type="button" class="btn btn-primary" onclick="location.href='/user/mypage'">정보 수정</button>
+            <!-- 뒤로가기 버튼 -->
+            <button type="button" class="btn btn-secondary" onclick="history.back()">뒤로가기</button>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

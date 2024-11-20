@@ -9,7 +9,9 @@
 // Spring Data JPA는 기본적인 CRUD 메서드를 자동으로 생성해 주기 때문에, create 메서드는 사실상 save()로 대체됩니다.
 package com.lyj.securitydomo.repository;
 
+import com.lyj.securitydomo.domain.Post;
 import com.lyj.securitydomo.domain.Report;
+import com.lyj.securitydomo.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -30,4 +32,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     // 특정 reportId에 해당하는 신고의 상태를 업데이트 (실제로 save로 처리됨)
     // JPA에서 기본적으로 제공되는 save()를 사용하여 상태를 갱신할 수 있음
     Report save(Report report);
+
+    // 특정 게시글과 사용자 조합으로 중복 신고 여부 확인
+    boolean existsByPostAndUser(Post post, User user);
 }
