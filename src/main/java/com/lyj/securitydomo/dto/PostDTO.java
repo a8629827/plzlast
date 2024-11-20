@@ -53,7 +53,6 @@ public class PostDTO {
     @Builder.Default
     private boolean isVisible = true; // 기본값은 true (공개 상태)
 
-//    private int reportCount; // 신고 횟수
 
     private Date deadline; // 모집 마감 기한
 

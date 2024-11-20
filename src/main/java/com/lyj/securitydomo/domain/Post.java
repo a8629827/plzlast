@@ -47,8 +47,7 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User author; // 작성자 정보
 
-//    @Column(nullable = false)
-//    private int reportCount = 0; // 신고 건수 초기값: 0
+
 
     @OneToMany(mappedBy = "post",
             fetch = FetchType.LAZY,

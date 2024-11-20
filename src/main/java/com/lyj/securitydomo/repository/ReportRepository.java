@@ -27,7 +27,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findByPost_PostId(Long postId);
 
     // 특정 게시글의 신고 횟수를 조회하는 메서드
-    int countByPost_PostId(Long postId);
+//    int countByPost_PostId(Long postId);
 
     // 특정 reportId에 해당하는 신고의 상태를 업데이트 (실제로 save로 처리됨)
     // JPA에서 기본적으로 제공되는 save()를 사용하여 상태를 갱신할 수 있음

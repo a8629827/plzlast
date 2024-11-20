@@ -172,10 +172,7 @@ public class ReportServiceImpl implements ReportService {
      * @param postId 게시글 ID
      * @return 신고 횟수
      */
-    @Override
-    public int countReportsByPostId(Long postId) {
-        return reportRepository.countByPost_PostId(postId);
-    }
+
 
     /**
      * Report 엔티티를 ReportDTO로 변환하는 메서드

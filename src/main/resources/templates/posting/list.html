@@ -70,8 +70,6 @@
                         th:if="${!isAdmin && !isAuthor[iterStat.index]}">
                   신고하기
                 </button>
-                <!-- 관리자에게만 신고 건수를 표시 (일반 사용자에게는 숨김) -->
-                <div th:if="${isAdmin}" th:text="'신고 건수: ' + ${post.reportCount} + '건'"></div>
 
                 <!-- 신청하기 버튼 (가운데 아래에 배치) -->
                 <button type="button" class="btn btn-primary btn-sm mt-auto position-absolute bottom-0 start-50 translate-middle-x mb-3"

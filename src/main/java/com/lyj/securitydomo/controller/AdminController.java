@@ -50,9 +50,7 @@ public class AdminController {
     @GetMapping("/reports/{postId}")
     public String getReportsByPostId(@PathVariable Long postId, Model model) {
         List<ReportDTO> reports = reportService.getReportsByPostId(postId);
-        int reportCount = reportService.countReportsByPostId(postId);
         model.addAttribute("reports", reports);
-        model.addAttribute("reportCount", reportCount);
         return "redirect:/post/read/" + postId;
     }
 
