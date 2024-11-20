@@ -32,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -67,14 +68,14 @@ public class PostController {
         boolean isAdmin = principal != null && principal.getUser().getRole().equals("ADMIN");
         model.addAttribute("isAdmin", isAdmin);
 
-
-
-        // 각 게시글에 대해 작성자인지 확인 (isAuthor 메서드)
+        // 각 게시글에 대해 작성자인지 확인 (isAuthor 리스트 생성)
+        List<Boolean> isAuthor = Collections.emptyList();
         if (principal != null) {
-            model.addAttribute("isAuthor", responseDTO.getDtoList().stream()
+            isAuthor = responseDTO.getDtoList().stream()
                     .map(postDTO -> postDTO.getAuthor().equals(principal.getUser().getUsername())) // 작성자 여부 확인
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
         }
+        model.addAttribute("isAuthor", isAuthor);
 
         // 데이터 전달
         model.addAttribute("posts", responseDTO.getDtoList());

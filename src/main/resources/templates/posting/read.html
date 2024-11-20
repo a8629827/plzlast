@@ -29,7 +29,7 @@
                     data-bs-toggle="modal"
                     data-bs-target="#applyModal"
                     th:attr="data-post-id=${post.postId}"
-                    th:if="${!isAuthor}">  <!-- 작성자가 아닐 경우에만 보이도록 조건 추가 -->
+                    th:if="${!isAuthor}"> <!-- 작성자가 아닐 경우에만 표시 -->
                 신청하기
             </button>
 
@@ -124,6 +124,7 @@
     </div>
     <!-- 신청하기 모달 -->
 
+    <!-- 신청하기 모달 -->
     <div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -141,7 +142,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="button" class="btn btn-primary" id="submitApplication">신청하기</button>
+                    <button type="button" class="btn btn-primary" id="submitApplication">제출</button>
                 </div>
             </div>
         </div>
@@ -300,57 +301,85 @@
                         });
                 });
             });
+            // 신청하기 버튼 클릭 시, 모달에 postId 설정
+            document.querySelectorAll('.btn-primary[data-bs-target="#applyModal"]').forEach(button => {
+                button.addEventListener('click', function () {
+                    const postId = this.getAttribute('data-post-id'); // 버튼의 data-post-id 값 가져오기
+                    console.log('신청하기 버튼 클릭 - Post ID:', postId);
 
-            // "신고하기" 버튼 클릭 이벤트
-            document.getElementById('submitReport').addEventListener('click', function () {
-                const category = document.getElementById('category').value;
-                const reason = document.getElementById('reason').value.trim();
-                const postId = document.getElementById('reportModal').getAttribute('data-post-id');
-                const userId = document.getElementById('userId').value;
+                    // 모달에 postId 저장
+                    const applyModal = document.getElementById('applyModal');
+                    applyModal.setAttribute('data-post-id', postId);
+                });
+            });
 
-                if (!category || !reason) {
-                    alert('신고 유형과 사유를 입력해주세요.');
+            // 신청하기 모달의 신청 버튼 클릭 이벤트
+            document.getElementById('submitApplication').addEventListener('click', function () {
+                const applyModal = document.getElementById('applyModal'); // 모달 DOM 요소
+                const postId = applyModal.getAttribute('data-post-id'); // 모달에서 postId 가져오기
+                const applicationReason = document.getElementById('applicationReason').value.trim();
+
+                if (!postId) {
+                    alert('게시글 ID가 유효하지 않습니다.');
+                    console.error('Post ID가 유효하지 않음:', postId);
                     return;
                 }
 
-                console.log('신고하기 요청 - postId:', postId, 'userId:', userId, '카테고리:', category, '사유:', reason);
+                if (!applicationReason) {
+                    alert('신청 사유를 입력해주세요.');
+                    return;
+                }
 
-                fetch('/report/create', {
+                console.log('신청 요청 - Post ID:', postId, '신청 사유:', applicationReason);
+
+                // 서버로 신청 요청 보내기
+                fetch('/request/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        postId: parseInt(postId, 10),
-                        userId: parseInt(userId, 10),
-                        category,
-                        reason,
+                        postId: postId,
+                        contentText: applicationReason,
                     }),
                 })
                     .then(response => {
-                        console.log('신고 응답 상태 코드:', response.status);
-                        if (!response.ok) throw new Error('신고 요청 실패');
+                        if (!response.ok) {
+                            return response.text().then(err => {
+                                console.error('신청 실패:', err);
+                                throw new Error(err);
+                            });
+                        }
                         return response.text();
                     })
                     .then(data => {
-                        console.log('신고 성공 응답:', data);
-                        alert(data); // 성공 메시지 표시
+                        console.log('신청 성공:', data);
 
                         // 모달 닫기
-                        const modalInstance = bootstrap.Modal.getInstance(document.getElementById('reportModal'));
+                        const modalInstance = bootstrap.Modal.getInstance(applyModal);
                         if (modalInstance) {
-                            modalInstance.hide();
+                            modalInstance.hide(); // 모달 닫기
                         }
 
-                        // 페이지 새로고침 또는 리디렉션
-                        location.href = `/posting/read/${postId}`;
+                        // 페이지 이동
+                        setTimeout(() => {
+                            alert(data); // 성공 메시지 표시
+                            window.location.href = `/posting/read/${postId}`; // read 페이지로 이동
+                        }, 300); // 모달이 닫힌 후 리다이렉션
                     })
                     .catch(error => {
-                        console.error('신고 실패:', error.message);
-                        alert('신고 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+                        console.error('신청 실패:', error.message);
+                        alert('신청에 실패했습니다. 이유: ' + error.message);
                     });
             });
+
+            // 모달 닫힐 때 입력 필드 초기화
+            document.getElementById('applyModal').addEventListener('hidden.bs.modal', function () {
+                document.getElementById('applicationReason').value = ''; // 입력 필드 초기화
+            });
         });
+
+
     </script>
 
     <!--    댓글 스크립트 부분-->
