@@ -1,14 +1,15 @@
-
-
 package com.lyj.securitydomo.controller;
 
+import com.lyj.securitydomo.config.auth.PrincipalDetails;
 import com.lyj.securitydomo.domain.Reply;
+import com.lyj.securitydomo.dto.PostDTO;
 import com.lyj.securitydomo.dto.ReplyDTO;
 import com.lyj.securitydomo.service.ReplyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -22,10 +23,12 @@ public class ReplyController {
     private final ReplyService replyService;
 
     @PostMapping("/{postId}")
-    public ResponseEntity<ReplyDTO> createReply(@PathVariable Long postId, @RequestBody ReplyDTO replyDTO) {
-        log.info("댓글 등록 요청: postId={}, replyDTO={}", postId, replyDTO);
-        replyService.createReply(postId, replyDTO);
-        return ResponseEntity.ok(replyDTO);
+    public ResponseEntity<Long> createReply(@PathVariable Long postId, @RequestBody ReplyDTO replyDTO,@AuthenticationPrincipal PrincipalDetails principal) {
+        log.info("ReplyDTO: " +replyDTO);
+        // 로그인된 사용자 정보 설정
+        replyDTO.setUsername(principal.getUsername());
+        Reply reply=replyService.createReply(postId, replyDTO);
+        return ResponseEntity.ok(reply.getReplyId());
     }
 
     @GetMapping("/{postId}")
@@ -45,8 +48,8 @@ public class ReplyController {
     }
 
     @PutMapping("/{replyId}")
-    public ResponseEntity<Void> modifyReply(@PathVariable Long replyId, @RequestBody String content) {
-        replyService.modifyReply(replyId, content);
+    public ResponseEntity<Void> modifyReply(@PathVariable Long replyId, @RequestBody ReplyDTO replyDTO) {
+        replyService.modifyReply(replyId, replyDTO);
         return ResponseEntity.noContent().build();
     }
 

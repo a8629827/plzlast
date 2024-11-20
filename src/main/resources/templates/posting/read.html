@@ -347,6 +347,8 @@
 
     <!--    댓글 스크립트 부분-->
     <script layout:fragment="script" th:inline="javascript">
+        // 서버에서 로그인된 사용자 정보 전달
+        const loggedInUsername = '[[${#authentication.name}]]'; // 현재 로그인된 사용자 이름
         const postId = '[[${post.postId}]]'; // 게시물 ID
         const replyList = document.querySelector('.replyList');
         const registerBtn = document.querySelector('.registerBtn'); // 댓글 등록 버튼
@@ -357,37 +359,41 @@
         let parentReplyId = null; // 대댓글의 부모 ID 저장
 
         // 댓글 리스트 출력
-        // 댓글 리스트를 화면에 출력하는 함수
         function printList(dtoList) {
+            let str = '';
             if (dtoList && dtoList.length > 0) {
-                for (const dto of dtoList) {
-                    str += `<li class="list-group-item d-flex postItem">
+                dtoList.forEach(dto => {
+                    str += `
+                <li class="list-group-item d-flex postItem">
                     <span class="col-1">${dto.replyId}</span>
-                    <span class="col-6" data-rno="${dto.replyId}">${dto.content}</span>
+                    <span class="col-6">${dto.content}</span>
                     <span class="col-2">${dto.username}</span>
                     <span class="col-2">${dto.regDate}</span>
-                    <button class="btn btn-outline-dark addCommentBtn" data-cno="${dto.postId}">댓글작성</button>
-                    <button class="btn btn-outline-primary editReplyBtn" data-replyid="${dto.replyId}">수정</button>
-                    <button class="btn btn-outline-danger deleteReplyBtn" data-replyid="${dto.replyId}">삭제</button>
+                    <button class="btn btn-outline-dark addCommentBtn" data-replyid="${dto.replyId}">대댓글 작성</button>
                 </li>`;
                     if (dto.children && dto.children.length > 0) {
                         str += `<ul>`;
-                        printList(dto.children);
+                        str += printList(dto.children);
                         str += `</ul>`;
                     }
-                }
+                });
+            } else {
+                str = '<li>등록된 댓글이 없습니다.</li>';
             }
-            replyList.innerHTML = str;
+            return str;
         }
 
         function printReplies() {
-            str = '';
-            replyList.innerHTML = '';
+            replyList.innerHTML = ''; // 기존 리스트 초기화
             getList(postId).then(data => {
-                console.log(data);
-                printList(data);
+                if (data && data.length > 0) {
+                    replyList.innerHTML = printList(data); // 댓글 목록 출력
+                } else {
+                    replyList.innerHTML = '<li>등록된 댓글이 없습니다.</li>'; // 댓글이 없을 경우
+                }
             }).catch(e => {
-                console.error(e);
+                console.error('댓글 목록 불러오기 오류:', e);
+                replyList.innerHTML = '<li>댓글을 불러오는 중 오류가 발생했습니다.</li>'; // 오류 메시지 출력
             });
         }
 
@@ -401,7 +407,9 @@
                 return;
             }
 
-            const replyObj = { content, username: '작성자 이름' }; // 작성자 이름 동적으로 설정
+            // 댓글 객체 생성
+            const replyObj = { content, username: loggedInUsername };
+
             addReply(replyObj, postId).then(() => {
                 alert('댓글이 등록되었습니다.');
                 replyContent.value = ''; // 입력란 초기화
@@ -421,7 +429,8 @@
                     return;
                 }
 
-                const replyObj = { content, username: '작성자 이름', parentId: parentReplyId }; // 작성자 이름 동적으로 설정
+                const replyObj = { content, username: loggedInUsername, parentId: parentReplyId };
+
                 addReply(replyObj, postId).then(() => {
                     alert('대댓글이 등록되었습니다.');
                     childReplyContent.value = ''; // 입력란 초기화
@@ -440,42 +449,6 @@
                 childReplyContent.value = ''; // 초기화
             }
         });
-
-        function printReplies() {
-            replyList.innerHTML = ''; // 기존 리스트 초기화
-            getList(postId).then(data => {
-                if (data && data.length > 0) {
-                    replyList.innerHTML = printList(data); // 댓글 목록 출력
-                } else {
-                    replyList.innerHTML = '<li>등록된 댓글이 없습니다.</li>'; // 댓글이 없을 경우
-                }
-            }).catch(e => {
-                console.error('댓글 목록 불러오기 오류:', e);
-                replyList.innerHTML = '<li>댓글을 불러오는 중 오류가 발생했습니다.</li>'; // 오류 메시지 출력
-            });
-        }
-
-        function printList(dtoList) {
-            let str = '';
-            dtoList.forEach(dto => {
-                str += `
-            <li class="list-group-item d-flex postItem">
-                <span class="col-1">${dto.replyId}</span>
-                <span class="col-6">${dto.content}</span>
-                <span class="col-2">${dto.username}</span>
-                <span class="col-2">${dto.regDate}</span>
-                <button class="btn btn-outline-dark addCommentBtn" data-replyid="${dto.replyId}">대댓글 작성</button>
-            </li>`;
-                if (dto.children && dto.children.length > 0) {
-                    str += `<ul>`;
-                    str += printList(dto.children);
-                    str += `</ul>`;
-                }
-            });
-            return str;
-        }
-
-
 
         // 글자수 표시 함수
         function updateCharCount() {
@@ -508,8 +481,6 @@
                 throw error;
             }
         }
-
-
     </script>
 
 

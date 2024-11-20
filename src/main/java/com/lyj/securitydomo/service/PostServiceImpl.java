@@ -81,7 +81,6 @@ public class PostServiceImpl implements PostService {
                 .requiredParticipants(post.getRequiredParticipants()) // 모집 인원
                 .status(post.getStatus() != null ? post.getStatus().name() : null) // 모집 상태
                 .author(post.getAuthor() != null ? post.getAuthor().getUsername() : null) // 작성자
-                .reportCount(post.getReportCount()) // 신고 횟수
                 .lat(post.getLat()) // 위도
                 .lng(post.getLng()) // 경도
                 .firstComeFirstServe(post.isFirstComeFirstServe()) // 선착순 여부
@@ -134,7 +133,6 @@ public class PostServiceImpl implements PostService {
                 .status(postDTO.getStatus() != null ? Post.Status.valueOf(postDTO.getStatus()) : Post.Status.모집중)
                 .lat(postDTO.getLat())
                 .lng(postDTO.getLng())
-                .reportCount(0)
                 .firstComeFirstServe(postDTO.isFirstComeFirstServe())
                 .deadline(postDTO.getDeadline())
                 .build();

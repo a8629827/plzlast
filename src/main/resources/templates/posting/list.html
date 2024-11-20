@@ -177,7 +177,7 @@
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ postId: postId, category: category, reason: reason }),
+            body: JSON.stringify({postId: postId, category: category, reason: reason}),
           })
                   .then(response => {
                     console.log('신고 응답 상태 코드:', response.status);

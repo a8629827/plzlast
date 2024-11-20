@@ -2,9 +2,11 @@ package com.lyj.securitydomo.service;
 
 import com.lyj.securitydomo.domain.Post;
 import com.lyj.securitydomo.domain.Reply;
+import com.lyj.securitydomo.domain.User;
 import com.lyj.securitydomo.dto.ReplyDTO;
 import com.lyj.securitydomo.repository.PostRepository;
 import com.lyj.securitydomo.repository.ReplyRepository;
+import com.lyj.securitydomo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.PageRequest;
@@ -23,11 +25,16 @@ import java.util.stream.Collectors;
 public class ReplyServiceImpl implements ReplyService {
     private final ReplyRepository replyRepository;
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Reply createReply(Long postId, ReplyDTO replyDTO) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        // 작성자 정보 조회
+        User user = userRepository.findByUsername(replyDTO.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         Reply reply = new Reply();
         reply.setPost(post);
@@ -45,10 +52,10 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     @Override
-    public void modifyReply(Long replyId, String content) {
+    public void modifyReply(Long replyId,ReplyDTO replyDTO) {
         Optional<Reply> optionalReply = replyRepository.findById(replyId);
         Reply reply = optionalReply.orElseThrow(() -> new RuntimeException("Reply not found"));
-        reply.changText(content);
+        reply.changText(replyDTO.getContent());
         replyRepository.save(reply);
     }
 
