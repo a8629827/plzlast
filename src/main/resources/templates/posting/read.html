@@ -179,7 +179,7 @@
             class="form-control"
             rows="2"
             maxlength="100"
-            placeholder="대댓글을 입력하세요."
+            placeholder="답글을 입력하세요."
             oninput="updateChildCharCount()"
     ></textarea>
         <div class="d-flex justify-content-between align-items-center mt-2">
@@ -395,6 +395,17 @@
         const childReplyBox = document.querySelector('#childReplyBox'); // 대댓글 입력 영역
         let parentReplyId = null; // 대댓글의 부모 ID 저장
 
+        //시간 포맷 변경 함수
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+        }
+
         // 댓글 리스트 출력
         function printList(dtoList) {
             let str = '';
@@ -402,12 +413,12 @@
                 dtoList.forEach(dto => {
                     str += `
                 <li class="list-group-item d-flex postItem">
-                    <span class="col-1">${dto.replyId}</span>
-                    <span class="col-6">${dto.content}</span>
                     <span class="col-2">${dto.username}</span>
-                    <span class="col-2">${dto.regDate}</span>
-                    <button class="btn btn-outline-dark addCommentBtn" data-replyid="${dto.replyId}">대댓글 작성</button>
-                </li>`;
+                    <span class="col-6">${dto.content}</span>
+                    <span class="col-3 text-muted">${formatDate(dto.regDate)}</span> <!-- 포맷된 시간 -->
+                    <button class="btn btn-outline-dark addCommentBtn" data-replyid="${dto.replyId}">답글 달기</button>
+                    <button class="btn btn-outline-danger deleteBtn" data-replyid="${dto.replyId}">삭제</button>
+                    </li>`;
                     if (dto.children && dto.children.length > 0) {
                         str += `<ul>`;
                         str += printList(dto.children);
