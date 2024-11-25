@@ -1,10 +1,130 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <title>BootaKey!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to bottom, #c9f1f9, #a1e6f7);
+      font-family: 'Arial', sans-serif;
+    }
+    .navbar {
+      background-color: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #5d9cec;
+    }
+    .navbar-brand i {
+      color: #ff7f50;
+    }
+    .header-img {
+      text-align: center;
+      padding: 50px;
+      background: linear-gradient(to top, #c9f1f9, #ffffff);
+      border-bottom: 1px solid #ddd;
+    }
+    .header-img img {
+      max-width: 150px;
+      border-radius: 50%;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
+    .header-img h1 {
+      font-size: 2.5rem;
+      color: #333;
+      margin-top: 20px;
+    }
+    .header-img p {
+      font-size: 1.2rem;
+      color: #555;
+    }
+    .btn-main {
+      background-color: #5d9cec;
+      color: #fff;
+      font-size: 1.2rem;
+      padding: 10px 30px;
+      border-radius: 20px;
+      margin: 10px;
+      transition: background-color 0.3s ease;
+    }
+    .btn-main:hover {
+      background-color: #4a8bd6;
+    }
+    .footer {
+      background-color: #5d9cec;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+    }
+  </style>
 </head>
 <body>
-$END$
+
+<!-- Header Section -->
+<div class="header-img">
+  <img src="/path/to/otter-image.png" alt="귀여운 수달 이미지">
+  <h1>BooTaKHey!</h1>
+  <p>환영합니다!"당신 근처의 커뮤니티
+    가까운 이웃과 함께 도움을 부탁해요”</p>
+  <div>
+    <a href="/user/login" class="btn btn-main">로그인</a>
+    <a href="/user/join" class="btn btn-main">회원가입</a>
+  </div>
+</div>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-light">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <i class="bi bi-house-door-fill"></i> BooTaKHey!
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item" sec:authorize="isAuthenticated()">
+          <a class="nav-link" href="/posting/list"><i class="bi bi-search"></i> 모임찾기</a>
+        </li>
+        <li class="nav-item" sec:authorize="isAuthenticated()">
+          <a class="nav-link" href="/posting/register"><i class="bi bi-pencil-square"></i> 모임등록하기</a>
+        </li>
+        <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle"></i> 마이페이지
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="/user/mypage">내 정보</a></li>
+            <li><a class="dropdown-item" href="/user/posts">나의 모임</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item" sec:authorize="!isAuthenticated()">
+          <a class="nav-link" href="/user/login"><i class="bi bi-box-arrow-in-right"></i> 로그인</a>
+        </li>
+        <li class="nav-item" sec:authorize="isAuthenticated()">
+          <a class="nav-link" href="/logout"><i class="bi bi-box-arrow-right"></i> 로그아웃</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Footer Section -->
+<footer class="footer">
+  <div class="container">
+    <p>© 2024 BootaKey! All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

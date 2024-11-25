@@ -1,11 +1,15 @@
 package com.lyj.securitydomo.controller;
 
+import com.lyj.securitydomo.config.auth.PrincipalDetails;
+import com.lyj.securitydomo.domain.Request;
 import com.lyj.securitydomo.dto.RequestDTO;
 import com.lyj.securitydomo.service.RequestService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +19,7 @@ import java.util.List;
  * RequestController는 요청(Request)와 관련된 웹 요청을 처리하는 컨트롤러입니다.
  * 신청 저장, 조회, 삭제 기능을 제공합니다.
  */
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/request")
 @Log4j2
@@ -62,35 +66,40 @@ public class RequestController {
         }
     }
 
-//    /**
-//     * 모든 요청 목록을 조회하여 반환합니다.
-//     * @return 모든 요청 목록 (RequestDTO 리스트 형태)
-//     */
-//    @GetMapping("/list")
-//    @ResponseBody
-//    public List<RequestDTO> getRequests() {
-//        return requestService.getRequests();
-//    }
-
     /**
      * 특정 게시물에 대한 요청 목록을 조회합니다.
      * @param postId 조회할 게시물의 ID
      * @return 해당 게시물에 대한 요청 목록 (RequestDTO 리스트 형태)
      */
-    @GetMapping("/list/post/{postId}")
+    @GetMapping("/requests/{postId}")
     @ResponseBody
-    public List<RequestDTO> getRequestsByPostId(@PathVariable Long postId) {
-        return requestService.getRequestsByPostId(postId);
+    public ResponseEntity<List<RequestDTO>> getRequestsByPostId(@PathVariable Long postId) {
+        try {
+            if (postId == null || postId <= 0) {
+                throw new IllegalArgumentException("유효하지 않은 게시물 ID입니다.");
+            }
+            List<RequestDTO> requests = requestService.getRequestsByPostId(postId);
+            return ResponseEntity.ok(requests);
+        } catch (IllegalArgumentException e) {
+            log.error("요청 목록 조회 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            log.error("서버 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     /**
-     * 특정 사용자가 신청한 요청 목록을 조회합니다.
-     * @param userId 조회할 사용자의 ID
+     * 현재 로그인한 사용자의 신청 목록을 조회합니다.
+     * @param principal 현재 로그인한 사용자의 인증 정보
      * @return 해당 사용자가 신청한 요청 목록 (RequestDTO 리스트 형태)
      */
-    @GetMapping("/list/user/{userId}")
+    @GetMapping("/requests/my")
     @ResponseBody
-    public List<RequestDTO> getRequestsByUserId(@PathVariable Long userId) {
+    public List<RequestDTO> getMyRequests(@AuthenticationPrincipal PrincipalDetails principal) {
+        Long userId = principal.getUser().getUserId();
+        log.info("현재 로그인한 사용자 신청 목록 조회 - 사용자 ID: {}", userId);
+
         return requestService.getRequestsByUserId(userId);
     }
 
@@ -102,11 +111,31 @@ public class RequestController {
     @DeleteMapping("/delete/{requestId}")
     public ResponseEntity<String> deleteRequest(@PathVariable Long requestId) {
         try {
-            // RequestService를 통해 요청 삭제
             requestService.deleteRequest(requestId);
-            return ResponseEntity.ok("요청이 삭제되었습니다.");
+            return ResponseEntity.ok("신청이 성공적으로 삭제되었습니다.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    // 수락 처리 (POST)
+    @PostMapping("/approve/{requestId}")
+    public ResponseEntity<String> approveRequest(@PathVariable Long requestId) {
+        try {
+            requestService.updateRequestStatus(requestId, Request.RequestStatus.APPROVED);
+            return ResponseEntity.ok("Request approved successfully");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Request not found");
+        }
+    }
+
+    // 거절 처리 (POST)
+    @PostMapping("/reject/{requestId}")
+    public ResponseEntity<String> rejectRequest(@PathVariable Long requestId) {
+        try {
+            requestService.updateRequestStatus(requestId, Request.RequestStatus.REJECTED);
+            return ResponseEntity.ok("Request rejected successfully");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Request not found");
         }
     }
 }

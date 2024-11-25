@@ -43,4 +43,7 @@ public interface RequestService {
      * @param requestId 삭제할 요청의 ID
      */
     void deleteRequest(Long requestId);
+
+    // 수락 또는 거절 상태를 변경하는 메소드
+    void updateRequestStatus(Long requestId, Request.RequestStatus status);
 }

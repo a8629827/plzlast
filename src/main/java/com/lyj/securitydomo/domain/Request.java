@@ -38,9 +38,6 @@ public class Request {
     @Enumerated(EnumType.STRING) // 문자열로 저장
     @Column(nullable = false)
     private Request.RequestStatus status; //신청 진행 상태(PENDING,APPROVED,REJECTED)
-//    @ManyToOne
-//    @JoinColumn(name = "request_status_id",nullable = false) // 외래키 매핑
-//    private RequestStatus requestStatus;
 
     public enum RequestStatus {
         PENDING,   // 승인 대기 중
@@ -50,7 +47,7 @@ public class Request {
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern ="yyyy-MM-dd H:mm:ss")
+    @JsonFormat(pattern ="yyyy-MM-dd")
     private Date regDate;
 
 

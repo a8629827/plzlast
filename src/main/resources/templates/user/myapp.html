@@ -1,81 +1,160 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/basic.html}">
-
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
 <head>
     <meta charset="UTF-8">
-    <title>내가 신청한 글 목록</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>나의 신청 목록</title>
     <style>
-        body {
-            background-color: #f8f9fa;
+        .request-list {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .card-img-top {
-            width: 100%;
-            height: auto;
-            max-height: 200px;
-            object-fit: cover;
+
+        .request-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .request-item:last-child {
+            border-bottom: none;
+        }
+
+        .request-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .request-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #555;
+            font-size: 18px;
+            margin-top: 20px;
         }
     </style>
 </head>
-
 <body>
 <div layout:fragment="content">
-    <header class="bg-dark py-5">
-        <div class="container px-4 px-lg-5 my-5">
-            <div class="text-center text-white">
-                <h1 class="display-4 fw-bolder">내가 신청한 글</h1>
-                <p class="lead fw-normal text-white-50 mb-0">신청한 게시글 목록을 확인하세요.</p>
-            </div>
+    <div class="request-list">
+        <h3>나의 신청 목록</h3>
+        <div th:if="${requests.isEmpty()}" class="empty-message">
+            신청한 모임이 없습니다.
         </div>
-    </header>
-
-    <section class="py-5">
-        <div class="container px-4 px-lg-5 mt-5">
-            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                <div class="col mb-5" th:each="post : ${appliedPosts}">
-                    <div class="card h-100">
-                        <a th:href="@{/posting/read/{postId}(postId=${post.postId})}" class="text-decoration-none">
-                            <img class="card-img-top img-thumbnail" th:src="${post.getThumbnail()}" alt="이미지"/>
-                        </a>
-                        <div class="card-body p-4">
-                            <div class="text-center">
-                                <h5 class="fw-bolder" th:text="${post.title}"></h5>
-                                <p th:text="'작성일: ' + ${post.createdAt}"></p>
-                                <p th:text="'모집 상태: ' + ${post.status}"></p>
-                                <p th:text="'모집 인원: ' + ${post.requiredParticipants} + '명'"></p>
-                            </div>
-                        </div>
-                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                            <div class="text-center">
-                                <!-- 신청 취소 버튼 -->
-                                <button type="button" class="btn btn-outline-danger mt-auto"
-                                        th:onclick="'cancelApplication(' + ${post.postId} +')'">신청 취소</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div th:each="request : ${requests}" class="request-item">
+            <div class="list-group-item">
+                <p>
+                    모임 제목:
+                    <a th:href="@{/posting/read/{postId}(postId=${request.postId})}" th:text="${request.postTitle}"></a>
+                </p>
+                <p th:text="'신청 사유: ' + ${request.contentText}"></p>
+                <p>
+                    신청 상태:
+                    <span th:if="${request.status == 'PENDING'}" class="text-warning">
+            <i class="bi bi-hourglass-split"></i> 대기 중
+        </span>
+                    <span th:if="${request.status == 'APPROVED'}" class="text-success">
+            <i class="bi bi-check-circle"></i> 승인됨
+        </span>
+                    <span th:if="${request.status == 'REJECTED'}" class="text-danger">
+            <i class="bi bi-x-circle"></i> 거절됨
+        </span>
+                </p>
+<!--                pending상태일때만 버튼 활성화-->
+                <button class="btn btn-danger btn-sm delete-request-btn"
+                        th:disabled="${request.status != 'PENDING'}"
+                        th:attr="data-request-id=${request.requestId}">
+                    신청 취소
+                </button>
             </div>
-        </div>
-    </section>
 
-    <script>
-        function cancelApplication(postId) {
-            if (confirm("정말로 이 글에 대한 신청을 취소하시겠습니까?")) {
-                fetch(`/posting/cancelApplication/${postId}`, {
-                    method: 'POST'
-                })
-                    .then(response => {
-                        if (!response.ok) throw new Error("신청 취소 실패");
-                        alert("신청이 취소되었습니다.");
-                        location.reload(); // 신청 취소 후 페이지 새로 고침
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        alert("신청 취소에 실패했습니다.");
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                console.log('DOM 로드 완료');
+                // 삭제 버튼 이벤트 리스너 추가
+                document.querySelectorAll('.delete-request-btn').forEach(button => {
+                    console.log('삭제 버튼 감지됨:', button);
+                    button.addEventListener('click', function () {
+                        const requestId = this.getAttribute('data-request-id');
+                        console.log('신청 취소 버튼 클릭됨 - Request ID:', requestId);
+
+                        if (!requestId) {
+                            console.error('신청 ID가 존재하지 않습니다.');
+                            alert('신청 ID가 유효하지 않습니다.');
+                            return;
+                        }
+
+                        const confirmDelete = confirm('정말로 신청을 취소하시겠습니까?');
+                        console.log('사용자 확인 - 결과:', confirmDelete);
+
+                        if (!confirmDelete) {
+                            console.log('신청 취소 취소됨');
+                            return;
+                        }
+
+                        console.log('신청 취소 요청 전송 중...');
+                        fetch(`/request/delete/${requestId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        })
+                            .then(response => {
+                                console.log('응답 수신 - 상태 코드:', response.status);
+
+                                if (!response.ok) {
+                                    return response.text().then(err => {
+                                        console.error('오류 발생:', err);
+                                        throw new Error(err);
+                                    });
+                                }
+                                return response.text();
+                            })
+                            .then(message => {
+                                console.log('신청 취소 성공 - 메시지:', message);
+                                alert(message);
+
+                                this.closest('.request-item').remove();
+                            })
+                            .catch(error => {
+                                console.error('신청 취소 실패:', error.message);
+                                alert('신청 취소에 실패했습니다.');
+                            });
                     });
-            }
-        }
-    </script>
+                });
+            });
+        </script>
+    </div>
 </div>
+
+
 </body>
+
 </html>

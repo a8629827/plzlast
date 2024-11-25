@@ -1,8 +1,10 @@
+
 package com.lyj.securitydomo.repository.search;
 
 import com.lyj.securitydomo.domain.Post;
 import com.lyj.securitydomo.domain.QPost;
 
+import com.lyj.securitydomo.domain.QUser;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.data.domain.Page;
@@ -30,7 +32,11 @@ public class PostSearchImpl extends QuerydslRepositorySupport implements PostSea
     @Override
     public Page<Post> searchAll(String[] types, String keyword, Pageable pageable, Boolean isVisible) {
         QPost post = QPost.post;
-        JPQLQuery<Post> query = from(post);
+        QUser user = QUser.user;
+
+        JPQLQuery<Post> query = from(post)
+                .leftJoin(post.user, user)
+                .fetchJoin();
 
         // 검색 조건을 적용
         if (types != null && types.length > 0 && keyword != null) {
@@ -44,6 +50,9 @@ public class PostSearchImpl extends QuerydslRepositorySupport implements PostSea
                         break;
                     case "c": // 내용 검색
                         builder.or(post.contentText.contains(keyword));
+                        break;
+                    case "u": // 유저 아이디 검색
+                        builder.or(user.username.contains(keyword));
                         break;
                 }
             }

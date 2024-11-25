@@ -45,7 +45,7 @@ public class Post extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "user_id")
-    private User author; // 작성자 정보
+    private User user; // 작성자 정보
 
 
 
@@ -137,6 +137,6 @@ public class Post extends BaseEntity {
      * @return 작성자 username
      */
     public String getAuthorUsername() {
-        return this.author != null ? this.author.getUsername() : null;
+        return this.user != null ? this.user.getUsername() : null;
     }
 }

@@ -17,15 +17,6 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long>, PostSearch {
 
 
-//    @Query("SELECT p FROM Post p WHERE " //동적쿼리
-//            + "(:keyword IS NULL OR p.title LIKE %:keyword% OR p.contentText LIKE %:keyword%) "
-//            + "AND (:types IS NULL OR p.title IN (:types))")
-//
-//
-//    Page<Post> searchAll(@Param("types") String[] types,
-//                         @Param("keyword") String keyword,
-//                         Pageable pageable);
-
 
     @EntityGraph(attributePaths = {"imageSet"})
     @Query("select p from Post p where p.postId=:postId")
@@ -33,6 +24,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostSearch {
     // isVisible == true인 게시글만 조회
     Page<Post> findByIsVisibleTrue(Pageable pageable);
 
-    @Query("select p from Post p where p.author.username=:username")
+    @Query("select p from Post p where p.user.username=:username")
     Page<Post> findByUsername(@Param("username") String username, Pageable pageable);
 }

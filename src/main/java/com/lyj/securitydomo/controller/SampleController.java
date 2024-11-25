@@ -12,7 +12,7 @@ public class SampleController {
     @GetMapping("/")
     public String home() {
         log.info("home");
-        return "index"; // index.html로 이동
+        return "/home"; // index.html로 이동
     }
 
     @GetMapping("/user/login")

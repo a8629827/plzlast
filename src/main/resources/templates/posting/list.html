@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.w3.org/1999/xhtml" layout:decorate="~{layout/basic.html}">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout/basic.html}">
 
 <head>
   <meta charset="UTF-8">
@@ -15,30 +17,13 @@
     <div class="container px-4 px-lg-5 my-5">
       <div class="text-center text-white">
         <h1 class="display-4 fw-bolder">BootakHEY!</h1>
-        <p class="lead fw-normal text-white-50 mb-0">혼자가 아니에요!</p>
+        <p class="lead fw-normal text-white-50 mb-0">"당신 근처의 커뮤니티
+          가까운 이웃과 함께 도움을 부탁해요!”</p>
       </div>
     </div>
   </header>
   <!-- 검색창 섹션 -->
-  <div class="container mt-4">
-    <form action="/posting/list" method="get">
-      <!-- 검색 시 페이지 크기를 설정하는 hidden 필드 -->
-      <input type="hidden" name="size" th:value="${pageRequestDTO.size}">
-      <div class="input-group mb-3">
-        <!-- 검색 필터 옵션 -->
-        <select class="form-select" name="type">
-          <option value="">---</option>
-          <option value="t" th:selected="${pageRequestDTO.type =='t'}">제목</option>
-          <option value="c" th:selected="${pageRequestDTO.type =='c'}">내용</option>
-        </select>
-        <!-- 키워드 입력 필드 -->
-        <input type="text" class="form-control" name="keyword" th:value="${pageRequestDTO.keyword}">
-        <!-- 검색 및 초기화 버튼 -->
-        <button class="btn btn-outline-secondary searchBtn" type="submit">Search</button>
-        <button class="btn btn-outline-secondary clearBtn" type="button" onclick="location.href='/posting/list'">Clear</button>
-      </div>
-    </form>
-  </div>
+
   <!-- 게시글 목록 섹션 -->
   <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">

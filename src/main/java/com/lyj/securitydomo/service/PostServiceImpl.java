@@ -3,6 +3,7 @@ package com.lyj.securitydomo.service;
 
 import com.lyj.securitydomo.domain.Post;
 import com.lyj.securitydomo.domain.User;
+import com.lyj.securitydomo.domain.QUser;
 import com.lyj.securitydomo.domain.pPhoto;
 import com.lyj.securitydomo.dto.PageRequestDTO;
 import com.lyj.securitydomo.dto.PageResponseDTO;
@@ -80,7 +81,7 @@ public class PostServiceImpl implements PostService {
                 .thumbnailLink(getThumbnailLink(post)) // 썸네일 링크
                 .requiredParticipants(post.getRequiredParticipants()) // 모집 인원
                 .status(post.getStatus() != null ? post.getStatus().name() : null) // 모집 상태
-                .author(post.getAuthor() != null ? post.getAuthor().getUsername() : null) // 작성자
+                .author(post.getUser() != null ? post.getUser().getUsername() : null) // 작성자
                 .lat(post.getLat()) // 위도
                 .lng(post.getLng()) // 경도
                 .firstComeFirstServe(post.isFirstComeFirstServe()) // 선착순 여부
@@ -128,7 +129,7 @@ public class PostServiceImpl implements PostService {
         Post post = Post.builder()
                 .title(postDTO.getTitle())
                 .contentText(postDTO.getContentText())
-                .author(user)
+                .user(user)
                 .requiredParticipants(postDTO.getRequiredParticipants())
                 .status(postDTO.getStatus() != null ? Post.Status.valueOf(postDTO.getStatus()) : Post.Status.모집중)
                 .lat(postDTO.getLat())
@@ -201,7 +202,7 @@ public class PostServiceImpl implements PostService {
 
         // 작성자 검증
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!post.getAuthor().getUsername().equals(currentUsername)) {
+        if (!post.getUser().getUsername().equals(currentUsername)) {
             throw new IllegalStateException("작성자만 게시글을 수정할 수 있습니다.");
         }
 

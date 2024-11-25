@@ -6,9 +6,11 @@ import com.lyj.securitydomo.domain.pPhoto;
 import com.lyj.securitydomo.dto.PageRequestDTO;
 import com.lyj.securitydomo.dto.PageResponseDTO;
 import com.lyj.securitydomo.dto.PostDTO;
+import com.lyj.securitydomo.dto.RequestDTO;
 import com.lyj.securitydomo.dto.upload.UploadFileDTO;
 import com.lyj.securitydomo.dto.upload.UploadResultDTO;
 import com.lyj.securitydomo.service.PostService;
+import com.lyj.securitydomo.service.RequestService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +51,7 @@ public class PostController {
     private String uploadPath;
 
     private final PostService postService;
+    private final RequestService requestService;
 
     /**
      * 게시글 목록을 조회하고 뷰에 전달하는 메서드
@@ -90,25 +93,35 @@ public class PostController {
      * 특정 게시글의 상세 정보를 조회하고 뷰에 전달하는 메서드
      */
     @GetMapping("/read/{postId}")
-    public String read(@PathVariable Long postId, Model model, @AuthenticationPrincipal PrincipalDetails principal) {
+    public String read(@PathVariable Long postId, Model model,
+                       @AuthenticationPrincipal PrincipalDetails principal) {
+        // 게시글 상세 정보 조회
         PostDTO postDTO = postService.readOne(postId);
         model.addAttribute("post", postDTO);
         model.addAttribute("originalImages", postDTO.getOriginalImageLinks());
+        model.addAttribute("isAuthor", true); // 작성자인 경우
 
         // 로그인한 사용자 정보 추가
-        if (principal != null) {
-            model.addAttribute("user", principal.getUser());
-        }
+        model.addAttribute("user", principal.getUser());
 
         // 관리자 여부 확인
-        boolean isAdmin = principal != null && principal.getUser().getRole().equals("ADMIN");
+        boolean isAdmin = "ADMIN".equals(principal.getUser().getRole());
         model.addAttribute("isAdmin", isAdmin);
 
         // 작성자 여부 확인
-        boolean isAuthor = principal != null && postDTO.getAuthor().equals(principal.getUser().getUsername());
+        boolean isAuthor = postDTO.getAuthor().equals(principal.getUser().getUsername());
         model.addAttribute("isAuthor", isAuthor);
 
+        // 신청자리스트 추가 (작성자일 경우에만 조회)
+        if (isAuthor) {
+            List<RequestDTO> requestList = requestService.getRequestsByPostId(postId);
+            model.addAttribute("requestList", requestList);
+        }
+
+        // 로그 출력
         log.info("게시글 상세 정보: {}", postDTO);
+        log.info("isAdmin: {}, isAuthor: {}", isAdmin, isAuthor);
+
         return "posting/read";
     }
 

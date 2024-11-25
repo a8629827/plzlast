@@ -2,12 +2,10 @@ package com.lyj.securitydomo.controller;
 
 import com.lyj.securitydomo.config.auth.PrincipalDetails;
 import com.lyj.securitydomo.domain.User;
-import com.lyj.securitydomo.dto.PageRequestDTO;
-import com.lyj.securitydomo.dto.PageResponseDTO;
-import com.lyj.securitydomo.dto.PostDTO;
-import com.lyj.securitydomo.dto.UserDTO;
+import com.lyj.securitydomo.dto.*;
 import com.lyj.securitydomo.repository.UserRepository;
 import com.lyj.securitydomo.service.PostService;
+import com.lyj.securitydomo.service.RequestService;
 import com.lyj.securitydomo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,6 +16,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.modelmapper.ModelMapper;
+
+import java.util.List;
 
 
 @Log4j2
@@ -30,6 +30,8 @@ public class UserController {
     private final UserService userService;
     private final PostService postService;
     private final ModelMapper modelMapper;
+    private final RequestService requestService;
+
 
     // 회원가입 페이지로 이동
     @GetMapping("/join")
@@ -165,12 +167,33 @@ public class UserController {
      * 게시글 읽기 및 수정 페이지를 보여주는 메서드
      */
     @GetMapping("/readwriting/{postId}")
-    public String read(@PathVariable Long postId, Model model) {
+    public String read(@PathVariable Long postId, Model model,
+                       @AuthenticationPrincipal PrincipalDetails principal) {
         PostDTO postDTO = postService.readOne(postId);
         log.info(postDTO);
         model.addAttribute("post", postDTO);
         model.addAttribute("originalImages", postDTO.getOriginalImageLinks()); // 이미지 링크 추가
         model.addAttribute("isAuthor", true); // 작성자인 경우
-        return "/user/readwriting"; // 상세보기 페이지
+// 작성자 여부 확인
+        boolean isAuthor = postDTO.getAuthor().equals(principal.getUser().getUsername());
+        model.addAttribute("isAuthor", isAuthor);
+        // 신청자리스트 추가 (작성자일 경우에만 조회)
+        if (isAuthor) {
+            List<RequestDTO> requestList = requestService.getRequestsByPostId(postId);
+            model.addAttribute("requestList", requestList);
+        }
+        return "/posting/read"; // 상세보기 페이지
+    }
+    @GetMapping("/myapp")
+        public String viewMyRequests(Model model, @AuthenticationPrincipal PrincipalDetails principal) {
+            if (principal == null) {
+                // 인증되지 않은 사용자 처리
+                return "redirect:/user/login"; // 로그인 페이지로 리다이렉트
+            }
+
+            Long userId = principal.getUser().getUserId();
+            List<RequestDTO> requests = requestService.getRequestsByUserId(userId);
+            model.addAttribute("requests", requests);
+        return "/user/myapp";
     }
 }
