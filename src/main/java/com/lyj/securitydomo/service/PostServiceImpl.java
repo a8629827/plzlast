@@ -10,6 +10,7 @@ import com.lyj.securitydomo.dto.PageResponseDTO;
 import com.lyj.securitydomo.dto.PostDTO;
 import com.lyj.securitydomo.dto.upload.UploadResultDTO;
 import com.lyj.securitydomo.repository.PostRepository;
+import com.lyj.securitydomo.repository.ReplyRepository;
 import com.lyj.securitydomo.repository.ReportRepository;
 import com.lyj.securitydomo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -45,7 +46,8 @@ public class PostServiceImpl implements PostService {
     private Boolean isVisible; // 게시글의 가시성 필터 추가 (null: 모든 게시글, true: 공개, false: 비공개)
     private final UserRepository userRepository;
     private final PostRepository postRepository;
-    private final ReportRepository reportRepository; // ReportRepository 의존성 주입
+    private final ReportRepository reportRepository;
+    private final ReplyRepository replyRepository;
 
 
     /**
@@ -69,6 +71,8 @@ public class PostServiceImpl implements PostService {
                 .collect(Collectors.toList())
                 : Collections.emptyList();
 
+        // 댓글 수 가져오기
+        int replyCount = replyRepository.countByPostId(post.getPostId());
         // DTO 빌더로 변환
         return PostDTO.builder()
                 .postId(post.getPostId()) // 게시글 ID
@@ -87,6 +91,7 @@ public class PostServiceImpl implements PostService {
                 .firstComeFirstServe(post.isFirstComeFirstServe()) // 선착순 여부
                 .deadline(post.getDeadline()) // 모집 마감 기한
                 .isVisible(post.isVisible()) // 공개 여부
+                .replyCount(replyCount) // 댓글 수
                 .build();
     }
 

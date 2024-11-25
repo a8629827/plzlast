@@ -39,11 +39,14 @@
                 <p th:text="'작성자: ' + ${post.author}"></p>
                 <p th:text="'모집 상태: ' + ${post.status}"></p>
                 <p th:text="'모집 인원: ' + ${post.requiredParticipants} + '명'"></p>
+                <p th:text="'댓글 수: ' + ${post.replyCount}"></p> <!-- 댓글 수 표시 -->
+
                 <!-- 작성자 본인 글 표시 -->
                 <div th:if="${isAuthor[iterStat.index]}" class="badge text-white position-absolute bottom-0 start-50 translate-middle-x mb-3"
                      style="background-color: #6c757d; padding: 0.5rem 1rem; border-radius: 15px;">
                   내가 작성한 글
-                </div>              </div>
+                </div>
+              </div>
             </div>
             <!-- 게시글 목록 카드 부분 수정 -->
             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">

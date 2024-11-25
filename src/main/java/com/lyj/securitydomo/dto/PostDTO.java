@@ -58,7 +58,7 @@ public class PostDTO {
 
     private boolean firstComeFirstServe; // 선착순 여부
 
-    private int commentCount; // 댓글 수
+    private int replyCount; // 댓글 수
 
     /**
      * 썸네일 이미지 링크를 반환합니다.

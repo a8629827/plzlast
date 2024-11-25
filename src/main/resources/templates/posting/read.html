@@ -190,6 +190,10 @@
     <!-- 댓글 입력 부분 -->
     <!-- 댓글 입력란 -->
     <div class="reply-input-box">
+        <!-- 댓글 수 표시 -->
+        <div class="comment-count mb-3">
+            <h6 th:text="'댓글 수: ' + ${post.replyCount}"></h6>
+        </div>
         <div class="user-info">
             <span class="username" th:text="${post.author}"></span>
         </div>
