@@ -7,21 +7,106 @@
     <meta charset="UTF-8">
     <title>게시글 상세보기</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu&display=swap" rel="stylesheet">
     <style>
+
+        body {
+            background-color: #b7dce8; /* 배경색 통일 */
+            font-family: 'Gaegu', sans-serif;
+        }
+        .container {
+            background-color: #ffffff; /* 흰색 배경 */
+            border-radius: 12px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* 부드러운 그림자 */
+            padding: 20px;
+        }
+        /* 썸네일 크기 */
+        .thumbnail {
+            max-width: 400px;
+            height: auto;
+            margin: auto;
+        }
+        /* 신청자 목록 */
+        .applicant-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+        }
+        /* 게시글 정보 */
+        .post-details {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .post-details h3 {
+            font-weight: bold;
+            color: #4a90e2;
+        }
+
+        .post-details .meta {
+            font-size: 14px;
+            color: #666;
+        }
+        .applicant-table th, .applicant-table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
 
         #childReplyBox {
             margin-top: 10px;
             margin-left: 20px; /* 약간 들여쓰기를 추가하여 대댓글의 위치를 시각적으로 구분 */
         }
-        /* 댓글 입력 박스 스타일 */
-        .reply-input-box {
-            background-color: #ffffff; /* 배경색을 하얀색으로 변경 */
-            border: 1px solid #ddd; /* 경계선 색 */
+        /* 댓글 스타일 */
+        .replyList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            margin-top: 20px;
+        }
+
+        .replyList li {
+            background-color: #f9f9f9; /* 댓글 배경색 */
+            border: 1px solid #eee; /* 경계선 */
             border-radius: 8px; /* 둥근 모서리 */
             padding: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); /* 그림자 */
+        }
+
+        .replyList .username {
+            font-weight: bold;
+            color: #007bff;
+            margin-right: 8px;
+        }
+
+        .replyList .timestamp {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .replyList .reply-content {
+            margin-top: 8px;
             font-size: 14px;
-            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 추가 */
+            color: #333;
+        }
+
+        /* 대댓글 스타일 */
+        .replyList .reply-child {
+            margin-left: 40px;
+            background-color: #f1f1f1;
+        }
+
+        /* 댓글 입력 박스 */
+        .reply-input-box {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .reply-input-box textarea {
@@ -34,17 +119,14 @@
             color: #333;
             resize: none;
             margin-top: 8px;
-            box-sizing: border-box;
         }
 
         .reply-input-box .d-flex {
             justify-content: space-between;
             align-items: center;
-            margin-top: 10px;
         }
 
         .reply-input-box .btn {
-            padding: 6px 15px;
             background-color: #007bff;
             color: white;
             border: none;
@@ -57,64 +139,6 @@
         .reply-input-box .btn:hover {
             background-color: #0056b3;
         }
-
-        /* 댓글 리스트 스타일 */
-        .replyList {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            margin-top: 20px;
-        }
-
-        .replyList li {
-            background-color: #f9f9f9; /* 댓글 배경색 */
-            border: 1px solid #eee; /* 경계선 색 */
-            border-radius: 8px; /* 둥근 모서리 */
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); /* 부드러운 그림자 */
-        }
-
-        .replyList li:last-child {
-            margin-bottom: 0;
-        }
-
-        .replyList .username {
-            font-weight: bold;
-            color: #333;
-            margin-right: 8px;
-            font-size: 15px;
-        }
-
-        .replyList .timestamp {
-            font-size: 12px;
-            color: #999;
-            margin-top: 2px;
-        }
-
-        .replyList .reply-content {
-            margin-top: 8px;
-            font-size: 14px;
-            line-height: 1.5;
-            color: #555;
-        }
-
-        /* 대댓글 스타일 */
-        .replyList .reply-child {
-            margin-left: 40px; /* 대댓글 들여쓰기 */
-            background-color: #f1f1f1; /* 대댓글 배경 */
-        }
-
-        /* 댓글 내용에서 댓글/대댓글 구분선 */
-        .replyList li {
-            border-left: 4px solid #007bff; /* 댓글의 왼쪽에 파란색 선 추가 */
-        }
-
-        /* 댓글 작성자 이름 위에 마우스를 올렸을 때 스타일 */
-        .replyList .username:hover {
-            color: #0056b3;
-            cursor: pointer;
-        }
     </style>
 
 </head>
@@ -124,11 +148,12 @@
 <div layout:fragment="content" class="container mt-5">
     <!-- 썸네일 이미지와 상단 버튼 영역 -->
     <div class="text-center">
-        <img th:src="${post.getThumbnail()}" class="img-fluid mb-3" alt="썸네일 이미지" style="max-width: 300px; height: auto;">
+        <img th:src="${post.getThumbnail()}" class="thumbnail" alt="썸네일 이미지">
+
         <!-- 신청자 리스트 영역 -->
-        <div th:if="${isAuthor}" class="mt-5">
+        <div th:if="${isAuthor}" class="applicant-section">
             <h4>신청자 목록</h4>
-            <table class="table table-bordered table-striped">
+            <table class="table table-bordered applicant-table">
                 <thead>
                 <tr>
                     <th>신청자 이름</th>
@@ -225,7 +250,7 @@
 
         <!-- 지도 표시 영역 -->
         <h4>모임 장소</h4>
-        <div id="map" style="width: 100%; height: 400px;"></div>
+        <div id="map" style="width: 80%; height: 400px;"></div>
 
         <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=9n21s23li1"></script>
         <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps-geocoder.js?ncpClientId=9n21s23li1"></script>
@@ -264,7 +289,7 @@
             </div>
         </div>
     </div>
-    <!-- 신청하기 모달 -->
+
 
     <!-- 신청하기 모달 -->
     <div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true" data-bs-backdrop="static">

@@ -5,12 +5,15 @@
   <title>로그인 페이지</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gaegu&display=swap');
+
     body {
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      background-color: #f0f2f5;
+      background-color: #b7dce8;
+      font-family: 'Gaegu', sans-serif;
     }
     .login-container {
       max-width: 400px;
@@ -18,30 +21,56 @@
       background-color: white;
       border-radius: 8px;
       box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
     h3 {
-      text-align: center;
       margin-bottom: 1.5rem;
-      color: #007bff;
+      color: #4a90e2;
+      font-size: 2rem;
     }
     .form-group label {
-      font-weight: 400;
-      color: #6c757d;
-      transition: color 0.2s, font-weight 0.2s;
+      font-weight: bold;
+      color: #333;
+    }
+    .form-group input {
+      border-radius: 8px;
+      font-size: 1rem;
     }
     .form-group input:focus {
       outline: none;
-      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
     }
-    .form-group input:focus + label {
-      color: #007bff;
-      font-weight: 500;
+    button {
+      font-size: 1.1rem;
+      padding: 0.75rem;
+      border-radius: 20px;
+    }
+    .btn-primary {
+      background-color: #4a90e2;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #3b7fc9;
+    }
+    .btn-outline-secondary {
+      border: 2px solid #4a90e2;
+      color: #4a90e2;
+    }
+    .btn-outline-secondary:hover {
+      background-color: #4a90e2;
+      color: white;
+    }
+    .alert {
+      font-size: 1rem;
+      color: white;
+      background-color: #ff6b6b;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
 <div class="login-container">
-  <h3>LOGIN</h3>
+  <h3>로그인</h3>
 
   <!-- 로그인 실패 메시지 표시 -->
   <div th:if="${param.error}" class="alert alert-danger" role="alert">
@@ -50,14 +79,14 @@
 
   <form th:action="@{/loginProcess}" method="post">
     <div class="form-group mb-3">
-      <label for="username" class="form-label">아이디:</label>
+      <label for="username" class="form-label">아이디</label>
       <input type="text" class="form-control" id="username" placeholder="아이디 입력" name="username" required>
     </div>
     <div class="form-group mb-4">
-      <label for="password" class="form-label">비밀번호:</label>
+      <label for="password" class="form-label">비밀번호</label>
       <input type="password" class="form-control" id="password" placeholder="비밀번호 입력" name="password" required>
     </div>
-    <button type="submit" class="btn btn-primary w-100 mb-2">로그인</button>
+    <button type="submit" class="btn btn-primary w-100 mb-3">로그인</button>
     <button type="button" class="btn btn-outline-secondary w-100" onclick="location.href='/user/join'">회원가입</button>
   </form>
 </div>

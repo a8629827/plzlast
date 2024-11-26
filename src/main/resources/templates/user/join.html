@@ -4,56 +4,98 @@
   <meta charset="UTF-8">
   <title>회원가입 페이지</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- flatpickr 라이브러리 추가 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <!-- jQuery 추가 -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/css/bootstrap-select.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu&display=swap" rel="stylesheet">
   <style>
     body {
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      background-color: #f0f2f5;
+      background-color: #b7dce8; /* 파스텔 블루 배경 */
+      font-family: 'Gaegu', sans-serif; /* 폰트 설정 */
+      margin: 0;
     }
     .register-container {
-      max-width: 400px;
-      padding: 2rem;
+      max-width: 400px; /* 폭 줄임 */
+      width: 90%; /* 반응형 */
+      padding: 1.5rem; /* 여백 조정 */
       background-color: white;
-      border-radius: 8px;
-      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 6px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 */
     }
     h3 {
       text-align: center;
-      margin-bottom: 1.5rem;
-      color: #007bff;
+      margin-bottom: 1.2rem;
+      color: #4a90e2;
+      font-size: 1.5rem; /* 폰트 크기 줄임 */
     }
     .form-label {
       color: #6c757d;
       font-weight: normal;
-      transition: color 0.3s, font-weight 0.3s;
+      font-size: 0.85rem; /* 폰트 크기 줄임 */
     }
     .form-control {
-      transition: border-color 0.3s, box-shadow 0.3s;
+      font-size: 0.8rem; /* 입력 필드 크기 줄임 */
+      padding: 0.4rem 0.5rem; /* 여백 조정 */
+      border-radius: 4px;
     }
     .form-control:focus {
-      border-color: #007bff;
-      box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+      border-color: #4a90e2;
+      box-shadow: 0 0 6px rgba(74, 144, 226, 0.3);
     }
-    .form-group:focus-within .form-label {
-      color: #007bff;
-      font-weight: bold;
+    .btn-primary {
+      background-color: #4a90e2;
+      border: none;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem; /* 버튼 크기 */
     }
-    .form-group:focus-within .form-control {
-      color: #212529;
+    .btn-primary:hover {
+      background-color: #3b7fc9;
     }
-    .form-control:not(:focus) {
-      color: #6c757d;
+    .btn-secondary {
+      background-color: #ffffff;
+      color: #4a90e2;
+      border: 1px solid #4a90e2;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+    }
+    .btn-secondary:hover {
+      background-color: #4a90e2;
+      color: white;
+    }
+    .btn-group .btn-outline-primary {
+      font-size: 0.75rem; /* 버튼 크기 감소 */
+      padding: 0.3rem 0.5rem;
+    }
+    .input-group-text {
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      font-size: 0.8rem;
     }
     .btn-group .btn-check:checked + .btn {
-      background-color: #007bff;
+      background-color: #4a90e2;
       color: white;
+    }
+    .form-group {
+      margin-bottom: 0.7rem; /* 각 요소 간 여백 감소 */
+    }
+    .selectpicker {
+      max-width: 100%; /* 기본 너비는 100%로 */
+      width: auto; /* 필요하면 내용에 맞게 조정 */
+      padding: 0.4rem; /* 내부 여백 줄임 */
+      font-size: 0.85rem; /* 폰트 크기 줄임 */
+    }
+
+    .selectpicker-container .dropdown-menu {
+      max-width: 100%; /* 드롭다운 너비 제한 */
+      padding: 0; /* 여백 제거 */
+    }
+
+    .col-6 .selectpicker {
+      width: 100%; /* 반응형으로 부모 컬럼의 너비를 따름 */
     }
   </style>
 </head>
@@ -100,20 +142,26 @@
       </div>
     </div>
     <div class="form-group mb-3">
-      <label for="city" class="form-label">시:</label>
-      <select class="form-select" id="city" name="city" required onchange="updateDistricts()">
-        <option value="">시를 선택하세요</option>
-        <option value="서울">서울</option>
-        <option value="부산">부산</option>
-        <option value="대구">대구</option>
-        <option value="인천">인천</option>
-      </select>
-    </div>
-    <div class="form-group mb-4">
-      <label for="state" class="form-label">구:</label>
-      <select class="form-select" id="state" name="state" required>
-        <option value="">구를 선택하세요</option>
-      </select>
+      <div class="row g-2">
+        <!-- 시 선택 -->
+        <div class="col-6">
+          <label for="city" class="form-label">시</label>
+          <select class="selectpicker form-control " id="city" name="city" required onchange="updateDistricts()">
+            <option value="">시를 선택하세요</option>
+            <option value="서울">서울</option>
+            <option value="부산">부산</option>
+            <option value="대구">대구</option>
+            <option value="인천">인천</option>
+          </select>
+        </div>
+        <!-- 구 선택 -->
+        <div class="col-6">
+          <label for="state" class="form-label">구</label>
+          <select class="selectpicker form-control " id="state" name="state" required>
+            <option value="">구를 선택하세요</option>
+          </select>
+        </div>
+      </div>
     </div>
     <div class="form-group mb-3 text-center">
       <button type="submit" class="btn btn-primary w-100">가입하기</button>
@@ -122,12 +170,16 @@
   </form>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/js/bootstrap-select.min.js"></script>
 <!-- flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
   // jQuery를 사용하여 모든 input 요소에 대해 autocomplete 끄기
   $(document).ready(function() {
     $('input').attr('autocomplete', 'off');
+    $('.selectpicker').selectpicker();
   });
 
   // 시에 따른 구 업데이트 함수
@@ -143,16 +195,35 @@
     const stateSelect = document.getElementById("state");
     const selectedCity = citySelect.value;
 
-    stateSelect.innerHTML = '<option value="">구를 선택하세요</option>';
+    // Bootstrap Select 완전 초기화
+    if ($(stateSelect).hasClass("selectpicker")) {
+      $(stateSelect).selectpicker("destroy"); // 기존 selectpicker 제거
+    }
+
+    // 기존 옵션 초기화
+    stateSelect.innerHTML = ""; // 모든 기존 옵션 제거
+
+    // 기본 선택지 추가
+    const defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.textContent = "구를 선택하세요";
+    stateSelect.appendChild(defaultOption);
+
+    // 선택된 시에 따라 새로운 구 옵션 추가
     if (selectedCity && districts[selectedCity]) {
-      districts[selectedCity].forEach(district => {
+      districts[selectedCity].forEach((district) => {
         const option = document.createElement("option");
         option.value = district;
         option.textContent = district;
         stateSelect.appendChild(option);
       });
     }
+
+    // Bootstrap Select 갱신
+    $(stateSelect).addClass("selectpicker"); // selectpicker 클래스 추가 (보장)
+    $(stateSelect).selectpicker(); // 다시 selectpicker 적용
   }
+
 
   // flatpickr 설정 (날짜 선택을 위한 달력)
   flatpickr("#birthDate", {
@@ -164,7 +235,7 @@
     allowInput: true, // 날짜 직접 입력 허용
     locale: {
       firstDayOfWeek: 1 // 주의 시작을 월요일로 설정
-    }
+    },
   });
 </script>
 

@@ -8,12 +8,117 @@
   <meta charset="UTF-8">
   <title>게시글 목록</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- custom 스타일 파일 연결 -->
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu&display=swap" rel="stylesheet">
+  <style>
+    /* 전체 배경색 */
+    body {
+      background-color: #b7dce8;
+      font-family: 'Gaegu', sans-serif;
+    }
+
+    /* 헤더 섹션 스타일 */
+    header {
+      background-color: #4c88cf; /* 헤더 색 */
+      color: white;
+    }
+
+    header .text-white {
+      color: white !important;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* 카드 스타일 */
+    .card {
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .card img {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .card .card-body {
+      padding: 1rem;
+      background-color: white;
+    }
+
+    .card .card-footer {
+      padding: 1rem;
+      background-color: #f8f9fa;
+      border-top: 1px solid #ddd;
+    }
+
+    /* 내가 작성한 글 배지 */
+    .badge {
+      background-color: #6c757d;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      border-radius: 15px;
+    }
+
+    /* 페이지네이션 */
+    .pagination .page-item.active .page-link {
+      background-color: #4a90e2;
+      border-color: #4a90e2;
+      color: white;
+    }
+
+    .pagination .page-link {
+      color: #4a90e2;
+    }
+
+    .pagination .page-link:hover {
+      background-color: #e3f2fd;
+    }
+
+    /* 모달 스타일 */
+    .modal-header {
+      background-color: #4a90e2;
+      color: white;
+      border-bottom: none;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .modal-footer .btn-primary {
+      background-color: #4a90e2;
+      border: none;
+    }
+
+    .modal-footer .btn-primary:hover {
+      background-color: #3b7fc9;
+    }
+
+    .modal-footer .btn-secondary {
+      border: none;
+      color: #4a90e2;
+      background-color: white;
+    }
+
+    .modal-footer .btn-secondary:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+
 </head>
 
 <body>
 <div layout:fragment="content">
-  <header class="bg-dark py-5">
+  <header class="py-5">
     <div class="container px-4 px-lg-5 my-5">
       <div class="text-center text-white">
         <h1 class="display-4 fw-bolder">BootakHEY!</h1>
@@ -67,8 +172,7 @@
 
                 <!-- 작성자 본인 글 표시 -->
                 <div th:if="${post.author == currentUsername}"
-                     class="badge text-white position-absolute bottom-0 start-50 translate-middle-x mb-3"
-                     style="background-color: #6c757d; padding: 0.5rem 1rem; border-radius: 15px;">
+                     class="badge text-white position-absolute bottom-0 start-50 translate-middle-x mb-3">
                   내가 작성한 글
                 </div>
               </div>

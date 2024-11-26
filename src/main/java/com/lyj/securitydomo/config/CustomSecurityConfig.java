@@ -67,12 +67,6 @@ public class CustomSecurityConfig {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    @Configuration
-    public class WebConfig implements WebMvcConfigurer {
-        @Override
-        public void addResourceHandlers(ResourceHandlerRegistry registry) {
-            registry.addResourceHandler("/images/**")
-                    .addResourceLocations("classpath:/static/images/");
-        }
+
+
     }
-}
