@@ -53,6 +53,7 @@
                 <p th:text="'작성자: ' + ${post.author}"></p>
                 <p th:text="'모집 상태: ' + ${post.status}"></p>
                 <p th:text="'모집 인원: ' + ${post.requiredParticipants} + '명'"></p>
+                <p th:text="'모집 마감일: ' + ${#dates.format(post.deadline, 'yyyy-MM-dd')}"></p>
 
                 <!-- 관리자에게만 신고 건수를 표시 -->
                 <div th:if="${isAdmin}" th:text="'신고 건수: ' + ${post.reportCount} + '건'"></div>

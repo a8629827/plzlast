@@ -3,10 +3,8 @@ package com.lyj.securitydomo.dto;
 import com.lyj.securitydomo.dto.upload.UploadResultDTO;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 import java.util.List;
@@ -19,6 +17,8 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class PostDTO {
 
     private Long postId; // 게시글 ID
@@ -53,8 +53,8 @@ public class PostDTO {
     @Builder.Default
     private boolean isVisible = true; // 기본값은 true (공개 상태)
 
-
-    private Date deadline; // 모집 마감 기한
+    @DateTimeFormat(pattern = "yyyy-MM-dd") // HTML에서 yyyy-MM-dd 형식으로 넘어오는 데이터를 변환
+    private Date deadline; // 모집 마감일
 
     private boolean firstComeFirstServe; // 선착순 여부
 

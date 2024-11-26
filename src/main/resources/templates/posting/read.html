@@ -219,6 +219,7 @@
             <h3 th:text="${post.title}">게시글 제목</h3>
             <p class="text-muted" th:text="'작성자: ' + ${post.author}"></p>
             <p class="text-muted" th:text="'등록일: ' + ${#dates.format(post.createdAt, 'yyyy-MM-dd')}"></p>
+            <p class="text-muted" th:text="'마감일: ' + ${#dates.format(post.deadline, 'yyyy-MM-dd')}"></p> <!-- 마감일 추가 -->
             <p th:text="${post.contentText}">게시글 본문 내용</p>
         </div>
 

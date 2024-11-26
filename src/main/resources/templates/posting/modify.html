@@ -63,6 +63,13 @@
           <label for="requiredParticipants" class="form-label">모집 인원</label>
           <input type="number" class="form-control" id="requiredParticipants" name="requiredParticipants" th:value="${post.requiredParticipants}" min="1" required>
         </div>
+        <!--모집마감일-->
+        <div class="mb-3">
+          <label for="deadline" class="form-label">모집 마감일</label>
+          <input type="date" class="form-control" id="deadline" name="deadline"
+                 th:value="${#dates.format(post.deadline, 'yyyy-MM-dd')}"
+                 min="${T(java.time.LocalDate).now()}" required>
+        </div>
 
         <!-- 장소 검색 및 지도 표시 영역 -->
         <div>
@@ -174,6 +181,17 @@
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('result') === 'modified') {
         alert("수정이 완료되었습니다.");
+      }
+    });
+    //모집마감기한부분
+    document.querySelector('form').addEventListener('submit', function (event) {
+      const deadlineInput = document.getElementById('deadline').value;
+      const selectedDate = new Date(deadlineInput);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selectedDate < today) {
+        alert("모집 마감일은 오늘 이후의 날짜여야 합니다.");
+        event.preventDefault();
       }
     });
   </script>

@@ -7,60 +7,73 @@
   <title>BootaKey!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background: linear-gradient(to bottom, #c9f1f9, #a1e6f7);
-      font-family: 'Arial', sans-serif;
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu&display=swap" rel="stylesheet">  <style>
+    body, html {
+      font-family: 'Gaegu', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      background-color: #b7dce8; /* 파스텔 파란색 배경 */
+      min-height: 100vh; /* 화면 높이를 기준으로 최소 높이 설정 */
+      display: flex; /* flexbox 레이아웃 사용 */
+      justify-content: center; /* 가로 방향 중앙 정렬 */
+      align-items: center; /* 세로 방향 중앙 정렬 */
+      flex-direction: column; /* 세로 방향으로 배치 */
     }
-    .navbar {
-      background-color: rgba(255, 255, 255, 0.8);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .navbar-brand {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #5d9cec;
-    }
-    .navbar-brand i {
-      color: #ff7f50;
-    }
+
     .header-img {
       text-align: center;
-      padding: 50px;
-      background: linear-gradient(to top, #c9f1f9, #ffffff);
-      border-bottom: 1px solid #ddd;
+      padding: 50px 0;
+      background-color: #b7dce8; /* 배경색 통일 */
+      border: none; /* 경계선 제거 */
     }
+
     .header-img img {
-      max-width: 150px;
+      max-width: 1200px; /* 이미지 최대 너비 */
+      height: auto; /* 이미지 비율 유지 */
       border-radius: 50%;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+      object-fit: contain;
+      padding: 10px;
     }
+
     .header-img h1 {
       font-size: 2.5rem;
       color: #333;
       margin-top: 20px;
     }
+
     .header-img p {
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       color: #555;
     }
+
     .btn-main {
       background-color: #5d9cec;
       color: #fff;
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       padding: 10px 30px;
       border-radius: 20px;
       margin: 10px;
       transition: background-color 0.3s ease;
     }
+
     .btn-main:hover {
       background-color: #4a8bd6;
     }
+
     .footer {
-      background-color: #5d9cec;
-      color: #fff;
+      background-color: #b7dce8;
+      color: #3a506b;
       text-align: center;
       padding: 15px;
+      position: fixed; /* 푸터를 화면 하단에 고정 */
+      bottom: 0;
+      left: 0;
+      width: 100%; /* 푸터가 화면의 너비 전체를 차지 */
+      border-top: none; /* 경계선 제거 */
     }
   </style>
 </head>
@@ -68,7 +81,7 @@
 
 <!-- Header Section -->
 <div class="header-img">
-  <img src="/path/to/otter-image.png" alt="귀여운 수달 이미지">
+  <img th:src="@{/images/haedal.png}" alt="이미지">
   <h1>BooTaKHey!</h1>
   <p>환영합니다!"당신 근처의 커뮤니티
     가까운 이웃과 함께 도움을 부탁해요”</p>
@@ -77,46 +90,6 @@
     <a href="/user/join" class="btn btn-main">회원가입</a>
   </div>
 </div>
-
-<!-- Navigation Bar -->
-<nav class="navbar navbar-expand-lg navbar-light">
-  <div class="container">
-    <a class="navbar-brand" href="/">
-      <i class="bi bi-house-door-fill"></i> BooTaKHey!
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item" sec:authorize="isAuthenticated()">
-          <a class="nav-link" href="/posting/list"><i class="bi bi-search"></i> 모임찾기</a>
-        </li>
-        <li class="nav-item" sec:authorize="isAuthenticated()">
-          <a class="nav-link" href="/posting/register"><i class="bi bi-pencil-square"></i> 모임등록하기</a>
-        </li>
-        <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-person-circle"></i> 마이페이지
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="/user/mypage">내 정보</a></li>
-            <li><a class="dropdown-item" href="/user/posts">나의 모임</a></li>
-          </ul>
-        </li>
-      </ul>
-      <ul class="navbar-nav">
-        <li class="nav-item" sec:authorize="!isAuthenticated()">
-          <a class="nav-link" href="/user/login"><i class="bi bi-box-arrow-in-right"></i> 로그인</a>
-        </li>
-        <li class="nav-item" sec:authorize="isAuthenticated()">
-          <a class="nav-link" href="/logout"><i class="bi bi-box-arrow-right"></i> 로그아웃</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
 
 <!-- Footer Section -->
 <footer class="footer">

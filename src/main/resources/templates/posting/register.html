@@ -51,6 +51,12 @@
           <input type="number" class="form-control" id="requiredParticipants" name="requiredParticipants" min="1" required>
         </div>
 
+        <div class="mb-3">
+          <label for="deadline" class="form-label">모집 마감일</label>
+          <input type="date" class="form-control" id="deadline" name="deadline"
+                 min="${T(java.time.LocalDate).now()}" required>
+        </div>
+
         <div>
           <label>만남 장소 설정</label>
           <input type="text" id="search" placeholder="장소 검색" style="width:80%; margin-bottom:10px;">
@@ -168,6 +174,19 @@
     }
 
     naver.maps.onJSContentLoaded = initializeMap;
+
+    document.getElementById('postForm').addEventListener('submit', function (event) {
+      const deadlineInput = document.getElementById('deadline').value;
+      const selectedDate = new Date(deadlineInput); // 사용자가 선택한 날짜
+      const today = new Date(); // 현재 날짜
+      // 시간 정보를 제거하고 날짜만 비교
+      today.setHours(0, 0, 0, 0);
+      selectedDate.setHours(0, 0, 0, 0);
+      if (selectedDate < today) {
+        alert("모집 마감일은 오늘 이후의 날짜여야 합니다.");
+        event.preventDefault(); // 폼 제출 중단
+      }
+    });
   </script>
 </div>
 </body>
