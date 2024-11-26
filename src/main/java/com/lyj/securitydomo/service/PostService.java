@@ -11,29 +11,29 @@ import java.util.List;
 
 public interface PostService {
 
-    // 게시글 등록 메서드
+    // 게시글 등록
     Long register(PostDTO postDTO);
 
-    // 게시글 조회 메서드
+    // 게시글 상세 조회
     PostDTO readOne(Long postId);
 
-    // 게시글 수정 메서드
+    // 게시글 수정
     void modify(PostDTO postDTO);
 
-    // 게시글 삭제 메서드
+    // 게시글 삭제
     void remove(Long postId);
 
-    // 게시글 목록 조회 메서드
-    PageResponseDTO<PostDTO> list(PageRequestDTO pageRequestDTO);
+    // 게시글 목록 조회
+    PageResponseDTO<PostDTO> list(PageRequestDTO pageRequestDTO, boolean isAdmin);
 
-    // 게시글 비공개 처리 메서드
-    void makePostInvisible(Long postId);  // 비공개 처리 메서드
+    // 게시글 비공개 처리
+    void makePostInvisible(Long postId);
 
-    //게시글 공개 처리 메서드
-    void makePostVisible(Long postId); // 공개 처리 메서드
+    // 게시글 공개 처리
+    void makePostVisible(Long postId);
 
-    //작성자가 쓴 글 리스트
-    public PageResponseDTO<PostDTO> writinglist(PageRequestDTO pageRequestDTO, User user);
+    // 작성자가 쓴 게시글 목록
+    PageResponseDTO<PostDTO> writinglist(PageRequestDTO pageRequestDTO, User user);
 
 
 }

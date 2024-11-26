@@ -7,6 +7,7 @@ import com.lyj.securitydomo.domain.QPost;
 import com.lyj.securitydomo.domain.QUser;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.JPQLQuery;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
 import java.util.List;
 
+@Log4j2
 public class PostSearchImpl extends QuerydslRepositorySupport implements PostSearch {
 
     public PostSearchImpl() {
@@ -62,6 +64,7 @@ public class PostSearchImpl extends QuerydslRepositorySupport implements PostSea
         // 가시성 필터를 동적으로 추가
         if (isVisible != null) {
             query.where(post.isVisible.eq(isVisible)); // true 또는 false에 따라 필터링
+            log.info("레포지토리에서 비공개 처리: {}", isVisible);
         }
 
         query.where(post.postId.gt(0L)); // 기본 조건: postId가 0보다 큰 게시글만 조회
@@ -69,7 +72,7 @@ public class PostSearchImpl extends QuerydslRepositorySupport implements PostSea
 
         List<Post> list = query.fetch(); // 결과 리스트 조회
         long total = query.fetchCount(); // 전체 게시글 수 조회
-
+        log.info("Fetched posts: {}", list); //조횓된 게시글 로그 출력
         return new PageImpl<>(list, pageable, total); // PageImpl로 반환하여 페이지 정보 포함
     }
 }

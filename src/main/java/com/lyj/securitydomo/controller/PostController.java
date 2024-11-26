@@ -57,28 +57,33 @@ public class PostController {
      * 게시글 목록을 조회하고 뷰에 전달하는 메서드
      */
     @GetMapping("/list")
-    public String list(PageRequestDTO pageRequestDTO, Model model, @AuthenticationPrincipal PrincipalDetails principal) {
+    public String list(PageRequestDTO pageRequestDTO, Model model,
+                       @AuthenticationPrincipal PrincipalDetails principal) {
 
         // 기본 페이지 크기 설정
         if (pageRequestDTO.getSize() <= 0) {
             pageRequestDTO.setSize(10);
         }
 
-        // 게시글 목록 조회
-        PageResponseDTO<PostDTO> responseDTO = postService.list(pageRequestDTO);
-
         // 사용자 역할(관리자 여부) 확인
         boolean isAdmin = principal != null && principal.getUser().getRole().equals("ADMIN");
         model.addAttribute("isAdmin", isAdmin);
+        log.info("(컨트롤러)Is Admin: {}", isAdmin); // 관리자 여부 확인 로그
 
-        // 각 게시글에 대해 작성자인지 확인 (isAuthor 리스트 생성)
-        List<Boolean> isAuthor = Collections.emptyList();
+
+        // 가시성 필터 설정
+        pageRequestDTO.setIsVisible(isAdmin ? null : true);
+        log.info("(컨트롤러)PageRequestDTO.isVisible: {}", pageRequestDTO.getIsVisible()); // 가시성 필터 확인
+
+        // 게시글 목록 조회
+        PageResponseDTO<PostDTO> responseDTO = postService.list(pageRequestDTO, isAdmin);
+
+        // 작성자인지 여부를 화면에서 판단하기 위해 currentUsername 추가
         if (principal != null) {
-            isAuthor = responseDTO.getDtoList().stream()
-                    .map(postDTO -> postDTO.getAuthor().equals(principal.getUser().getUsername())) // 작성자 여부 확인
-                    .collect(Collectors.toList());
+            String currentUsername = principal.getUser().getUsername();
+            model.addAttribute("currentUsername", currentUsername);
         }
-        model.addAttribute("isAuthor", isAuthor);
+
 
         // 데이터 전달
         model.addAttribute("posts", responseDTO.getDtoList());
@@ -111,6 +116,11 @@ public class PostController {
         // 작성자 여부 확인
         boolean isAuthor = postDTO.getAuthor().equals(principal.getUser().getUsername());
         model.addAttribute("isAuthor", isAuthor);
+
+        // 게시글 공개 상태 추가 (관리자 전용)
+        if (isAdmin) {
+            model.addAttribute("isVisible", postDTO.isVisible());
+        }
 
         // 신청자리스트 추가 (작성자일 경우에만 조회)
         if (isAuthor) {
@@ -239,8 +249,11 @@ public class PostController {
         try {
             postService.makePostInvisible(postId);
             redirectAttributes.addFlashAttribute("message", "게시글이 비공개 처리되었습니다.");
+            log.info("게시글 비공개 처리 완료: postId={}", postId); // 추가된 로그 메시지
         } catch (EntityNotFoundException e) {
             redirectAttributes.addFlashAttribute("error", "해당 게시글을 찾을 수 없습니다.");
+            log.error("게시글 비공개 처리 중 오류: postId={}, error={}", postId, e.getMessage()); // 추가된 오류 로그
+
         }
         return "redirect:/posting/list";
     }
@@ -252,10 +265,14 @@ public class PostController {
     @PostMapping("/show/{postId}")
     public String markPostAsVisible(@PathVariable Long postId, RedirectAttributes redirectAttributes) {
         try {
-            postService.makePostVisible(postId);
+            postService.makePostVisible(postId); //게시글 공개 처리
             redirectAttributes.addFlashAttribute("message", "게시글이 공개 처리되었습니다.");
+            log.info("게시글 공개 처리 완료: postId={}", postId); // 추가된 로그 메시지
+
         } catch (EntityNotFoundException e) {
             redirectAttributes.addFlashAttribute("error", "해당 게시글을 찾을 수 없습니다.");
+            log.error("게시글 공개 처리 중 오류: postId={}, error={}", postId, e.getMessage()); // 추가된 오류 로그
+
         }
         return "redirect:/posting/list";
     }

@@ -92,6 +92,7 @@ public class PostServiceImpl implements PostService {
                 .deadline(post.getDeadline()) // 모집 마감 기한
                 .isVisible(post.isVisible()) // 공개 여부
                 .replyCount(replyCount) // 댓글 수
+                .reportCount(replyCount)//신고 수
                 .build();
     }
 
@@ -310,26 +311,39 @@ public class PostServiceImpl implements PostService {
      * @return 페이징된 게시글 DTO 목록
      */
     @Override
-    public PageResponseDTO<PostDTO> list(PageRequestDTO pageRequestDTO) {
+    public PageResponseDTO<PostDTO> list(PageRequestDTO pageRequestDTO, boolean isAdmin) {
         Pageable pageable = pageRequestDTO.getPageable("postId");
+
+        // 가시성 필터 설정: 관리자는 null(모든 게시글), 일반 사용자는 true(공개된 게시글만)
+        Boolean isVisible = isAdmin ? null : true;
+        pageRequestDTO.setIsVisible(isVisible); // PageRequestDTO에도 필터 값을 반영
+
+        log.info("PostServiceImpl - 요청 처리 시작");
+        log.info("사용자 타입 (관리자 여부): {}", isAdmin ? "관리자" : "일반 사용자");
+        log.info("isVisible 필터: {}", isVisible);
+
+        // 레포지토리 검색
         Page<Post> result = postRepository.searchAll(
                 pageRequestDTO.getTypes(),
                 pageRequestDTO.getKeyword(),
                 pageable,
-                pageRequestDTO.getIsVisible()
+                isVisible // 가시성 필터 적용
         );
-
-        // Post 엔티티 리스트를 DTO 리스트로 변환
+        log.info("레포지토리에서 반환된 게시글: {}", result.getContent());
+        // Post 엔티티를 PostDTO로 변환
         List<PostDTO> dtoList = result.getContent().stream()
-                .map(this::convertToDTO) // 변환 메서드 사용
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
 
+        log.info("검색 결과: 총 {}개의 게시글 조회됨", result.getTotalElements());
+
         return PageResponseDTO.<PostDTO>withAll()
-                .pageRequestDTO(pageRequestDTO) // 요청 정보
+                .pageRequestDTO(pageRequestDTO) // 요청 정보 포함
                 .dtoList(dtoList) // 변환된 DTO 리스트
                 .total((int) result.getTotalElements()) // 총 게시글 수
                 .build();
     }
+
 
 
     @Override
@@ -355,7 +369,8 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public void makePostInvisible(Long postId) {
-        Post post = getPostById(postId); // 게시글 조회 및 검증
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 게시글을 찾을 수 없습니다."));
         post.setIsVisible(false); // 게시글을 비공개로 설정
         postRepository.save(post); // 변경 사항 저장
 
@@ -370,7 +385,8 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public void makePostVisible(Long postId) {
-        Post post = getPostById(postId); // 게시글 조회 및 검증
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 게시글을 찾을 수 없습니다."));
         post.setIsVisible(true); // 게시글을 공개로 설정
         postRepository.save(post); // 변경 사항 저장
 

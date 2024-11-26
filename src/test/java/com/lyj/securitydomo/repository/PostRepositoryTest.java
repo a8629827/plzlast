@@ -30,26 +30,26 @@ public class PostRepositoryTest {
         postRepository.deleteAll(); // 모든 게시글 삭제
     }
 
-    @Test
-    public void testInsert() {
-        Long userId = 1L; // 실제로 존재하는 사용자 ID
-
-        // User 엔티티를 영속화된 상태로 가져오기
-        User user = userRepository.findById(userId).orElseThrow();
-
-        IntStream.rangeClosed(1, 10).forEach(i -> {
-            Post post = Post.builder()
-                    .title("title" + i)
-                    .contentText("content" + i)
-                    .author(user) // 가져온 사용자 정보를 사용
-                    .requiredParticipants(i + 5) // 모집 인원 설정 (예: 6~15)
-                    .status(Post.Status.모집중) // 모집 상태 설정
-                    .build();
-
-            Post result = postRepository.save(post);
-            log.info(result);
-        });
-    }
+//    @Test
+//    public void testInsert() {
+//        Long userId = 1L; // 실제로 존재하는 사용자 ID
+//
+//        // User 엔티티를 영속화된 상태로 가져오기
+//        User user = userRepository.findById(userId).orElseThrow();
+//
+//        IntStream.rangeClosed(1, 10).forEach(i -> {
+//            Post post = Post.builder()
+//                    .title("title" + i)
+//                    .contentText("content" + i)
+//                    .author(user) // 가져온 사용자 정보를 사용
+//                    .requiredParticipants(i + 5) // 모집 인원 설정 (예: 6~15)
+//                    .status(Post.Status.모집중) // 모집 상태 설정
+//                    .build();
+//
+//            Post result = postRepository.save(post);
+//            log.info(result);
+//        });
+//    }
 
     @Test
     public void testSelect() {

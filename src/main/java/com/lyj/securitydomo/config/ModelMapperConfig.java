@@ -17,8 +17,9 @@ public class ModelMapperConfig {
 
         // Report -> ReportDTO 매핑
         modelMapper.createTypeMap(Report.class, ReportDTO.class)
-                .addMapping(report -> report.getPost().getPostId(), ReportDTO::setPostId) // Report의 Post 객체에서 postId를 가져와 ReportDTO에 설정
-                .addMapping(report -> report.getUser().getUserId(), ReportDTO::setUserId);    // User ID 매핑 추가
+                .addMapping(report -> report.getPost().getPostId(), ReportDTO::setPostId) // postId 매핑
+                .addMapping(report -> report.getUser().getUserId(), ReportDTO::setUserId) // userId 매핑
+                .addMapping(report -> report.getPost().getTitle(), ReportDTO::setPostTitle); // postTitle 매핑
 
         modelMapper.createTypeMap(Request.class, RequestDTO.class)
                 .addMapping(request -> request.getPost().getPostId(), RequestDTO::setPostId) //Request의 Post 객체에서 postId를 가져와 RequestDTO에 설정

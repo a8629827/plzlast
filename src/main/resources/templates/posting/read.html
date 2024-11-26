@@ -13,6 +13,108 @@
             margin-top: 10px;
             margin-left: 20px; /* 약간 들여쓰기를 추가하여 대댓글의 위치를 시각적으로 구분 */
         }
+        /* 댓글 입력 박스 스타일 */
+        .reply-input-box {
+            background-color: #ffffff; /* 배경색을 하얀색으로 변경 */
+            border: 1px solid #ddd; /* 경계선 색 */
+            border-radius: 8px; /* 둥근 모서리 */
+            padding: 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 추가 */
+        }
+
+        .reply-input-box textarea {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+            resize: none;
+            margin-top: 8px;
+            box-sizing: border-box;
+        }
+
+        .reply-input-box .d-flex {
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .reply-input-box .btn {
+            padding: 6px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .reply-input-box .btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* 댓글 리스트 스타일 */
+        .replyList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            margin-top: 20px;
+        }
+
+        .replyList li {
+            background-color: #f9f9f9; /* 댓글 배경색 */
+            border: 1px solid #eee; /* 경계선 색 */
+            border-radius: 8px; /* 둥근 모서리 */
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05); /* 부드러운 그림자 */
+        }
+
+        .replyList li:last-child {
+            margin-bottom: 0;
+        }
+
+        .replyList .username {
+            font-weight: bold;
+            color: #333;
+            margin-right: 8px;
+            font-size: 15px;
+        }
+
+        .replyList .timestamp {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .replyList .reply-content {
+            margin-top: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        /* 대댓글 스타일 */
+        .replyList .reply-child {
+            margin-left: 40px; /* 대댓글 들여쓰기 */
+            background-color: #f1f1f1; /* 대댓글 배경 */
+        }
+
+        /* 댓글 내용에서 댓글/대댓글 구분선 */
+        .replyList li {
+            border-left: 4px solid #007bff; /* 댓글의 왼쪽에 파란색 선 추가 */
+        }
+
+        /* 댓글 작성자 이름 위에 마우스를 올렸을 때 스타일 */
+        .replyList .username:hover {
+            color: #0056b3;
+            cursor: pointer;
+        }
     </style>
 
 </head>
@@ -73,7 +175,7 @@
             </button>
 
             <!-- 관리자에게만 신고 건수를 표시 -->
-            <div th:if="${(isAdmin ?: false)}" th:text="'신고 건수: ' + ${post.reportt} + '건'"></div>
+            <div th:if="${(isAdmin ?: false)}" th:text="'신고 건수: ' + ${post.reportCount} + '건'"></div>
 
             <!-- 관리자에게는 공개/비공개 표시, 일반 유저에게는 보이지 않음 -->
             <span th:if="${(isAdmin ?: false)}">
@@ -195,7 +297,7 @@
             <h6 th:text="'댓글 수: ' + ${post.replyCount}"></h6>
         </div>
         <div class="user-info">
-            <span class="username" th:text="${post.author}"></span>
+            <span class="username" th:text="${user.username}"></span>
         </div>
         <textarea
                 id="replyContent"
@@ -231,6 +333,7 @@
             <button class="btn btn-outline-dark addReplyBtn">대댓글 등록</button>
         </div>
     </div>
+
 
 
 
