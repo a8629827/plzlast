@@ -23,6 +23,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostSearch {
     Optional<Post> findByIdWithImages(Long postId);
 
 
-    @Query("select p from Post p where p.user.username=:username")
+    @Query("SELECT p FROM Post p WHERE p.user.username = :username ORDER BY p.createdAt DESC")
     Page<Post> findByUsername(@Param("username") String username, Pageable pageable);
 }

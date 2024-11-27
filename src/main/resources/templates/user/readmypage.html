@@ -82,24 +82,30 @@
     </style>
 </head>
 
+<body>
 <div layout:fragment="content">
     <div class="main-container">
         <h3>My Page</h3>
         <div class="btn-group">
-            <!-- 각 버튼 -->
-            <button type="button" class="btn btn-custom btn-writing" onclick="location.href='/user/mywriting'">
+            <!-- 타임리프 URL로 버튼 연결 -->
+            <button type="button" class="btn btn-custom btn-writing"
+                    th:onclick="|location.href='@{/user/mywriting}'|">
                 나의 작성글
             </button>
-            <button type="button" class="btn btn-custom btn-application" onclick="location.href='/user/myapp'">
+            <button type="button" class="btn btn-custom btn-application"
+                    th:onclick="|location.href='@{/user/myapp}'|">
                 나의 신청목록
             </button>
-            <button type="button" class="btn btn-custom btn-edit-info" onclick="location.href='/user/mypage'">
+            <button type="button" class="btn btn-custom btn-edit-info"
+                    th:onclick="|location.href='@{/user/mypage}'|">
                 내 정보 수정
             </button>
-            <button type="button" class="btn btn-custom btn-view-info" onclick="location.href='/user/info'">
+            <button type="button" class="btn btn-custom btn-view-info"
+                    th:onclick="|location.href='@{/user/info}'|">
                 내 정보 보기
             </button>
         </div>
     </div>
 </div>
+</body>
 </html>

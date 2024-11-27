@@ -1,6 +1,7 @@
 package com.lyj.securitydomo.controller;
 
 import com.lyj.securitydomo.config.auth.PrincipalDetails;
+import com.lyj.securitydomo.domain.Post;
 import com.lyj.securitydomo.domain.QPost;
 import com.lyj.securitydomo.domain.pPhoto;
 import com.lyj.securitydomo.dto.PageRequestDTO;
@@ -9,15 +10,18 @@ import com.lyj.securitydomo.dto.PostDTO;
 import com.lyj.securitydomo.dto.RequestDTO;
 import com.lyj.securitydomo.dto.upload.UploadFileDTO;
 import com.lyj.securitydomo.dto.upload.UploadResultDTO;
+import com.lyj.securitydomo.repository.PostRepository;
 import com.lyj.securitydomo.service.PostService;
 import com.lyj.securitydomo.service.RequestService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -52,17 +56,24 @@ public class PostController {
 
     private final PostService postService;
     private final RequestService requestService;
+    private final PostRepository postRepository;
 
     /**
      * 게시글 목록을 조회하고 뷰에 전달하는 메서드
      */
     @GetMapping("/list")
     public String list(PageRequestDTO pageRequestDTO, Model model,
-                       @AuthenticationPrincipal PrincipalDetails principal) {
+                       @AuthenticationPrincipal PrincipalDetails principal,
+                       HttpServletRequest request) {
+
+
+        log.info("(전체글보기)Received PageRequestDTO: page={}, size={}", pageRequestDTO.getPage(), pageRequestDTO.getSize());
+        log.info("Raw HTTP parameters: {}", request.getParameterMap());
+        log.info("Query String: {}", request.getQueryString());
 
         // 기본 페이지 크기 설정
         if (pageRequestDTO.getSize() <= 0) {
-            pageRequestDTO.setSize(10);
+            pageRequestDTO.setSize(8);
         }
 
         // 사용자 역할(관리자 여부) 확인
@@ -71,17 +82,23 @@ public class PostController {
         log.info("(컨트롤러)Is Admin: {}", isAdmin); // 관리자 여부 확인 로그
 
 
+
         // 가시성 필터 설정
         pageRequestDTO.setIsVisible(isAdmin ? null : true);
         log.info("(컨트롤러)PageRequestDTO.isVisible: {}", pageRequestDTO.getIsVisible()); // 가시성 필터 확인
 
         // 게시글 목록 조회
         PageResponseDTO<PostDTO> responseDTO = postService.list(pageRequestDTO, isAdmin);
+        responseDTO.getDtoList().forEach(post -> {
+            log.info("(컨트롤러) Post Author: {}", post.getAuthor());
+        });
 
         // 작성자인지 여부를 화면에서 판단하기 위해 currentUsername 추가
         if (principal != null) {
             String currentUsername = principal.getUser().getUsername();
             model.addAttribute("currentUsername", currentUsername);
+            log.info("(컨트롤러) Current Username: {}", currentUsername);
+
         }
 
 
@@ -89,11 +106,73 @@ public class PostController {
         model.addAttribute("posts", responseDTO.getDtoList());
         model.addAttribute("totalPages", (int) Math.ceil(responseDTO.getTotal() / (double) pageRequestDTO.getSize()));
         model.addAttribute("currentPage", pageRequestDTO.getPage());
+        model.addAttribute("baseUrl", "/posting/list"); // 페이징 경로
 
         log.info("게시글 목록 전달: {}", responseDTO.getDtoList());
         return "posting/list";
     }
 
+    // 내가 쓴 글 보기 메서드 추가
+    @GetMapping("/user/mywriting")
+    public String myPosts(
+            @ModelAttribute PageRequestDTO pageRequestDTO,
+            Model model,
+            @AuthenticationPrincipal PrincipalDetails principal,
+            HttpServletRequest request) {
+
+        // 요청된 HTTP 파라미터 출력 (디버깅용)
+        log.info("Raw HTTP parameters: {}", request.getParameterMap());
+        log.info("Query String: {}", request.getQueryString());
+        log.info("(내글보기) 요청된 PageRequestDTO: page={}, size={}", pageRequestDTO.getPage(), pageRequestDTO.getSize());
+
+        // 인증되지 않은 사용자의 처리 제거
+        if (principal == null) {
+            log.warn("로그인되지 않은 사용자가 요청을 시도했습니다.");
+            return "redirect:/user/login";
+        }
+
+        // PageRequestDTO가 비어있는 경우 기본값을 설정
+        if (pageRequestDTO.getPage() <= 0) {
+            pageRequestDTO.setPage(1); // 기본 페이지는 1
+        }
+        if (pageRequestDTO.getSize() <= 0) {
+            pageRequestDTO.setSize(8); // 기본 사이즈는 8
+        }
+
+        log.info("(내글보기) 수정된 PageRequestDTO: page={}, size={}", pageRequestDTO.getPage(), pageRequestDTO.getSize());
+
+        // 현재 로그인된 사용자 확인
+        String username = principal.getUser().getUsername();
+        log.info("요청한 사용자 이름: {}", username);
+
+        // PostService에서 사용자 게시글 조회
+        PageResponseDTO<PostDTO> responseDTO = postService.getPostsByUsername(username, pageRequestDTO);
+
+        // 총 페이지 수 계산
+        int totalPages = (int) Math.ceil(responseDTO.getTotal() / (double) pageRequestDTO.getSize());
+        log.info("응답 게시글 개수: {}, 총 페이지 수: {}", responseDTO.getDtoList().size(), totalPages);
+
+        // 잘못된 페이지 요청 방지
+        if (pageRequestDTO.getPage() > totalPages && totalPages > 0) {
+            log.warn("요청한 페이지 번호가 총 페이지 수를 초과했습니다. 마지막 페이지로 리다이렉트합니다.");
+            pageRequestDTO.setPage(totalPages); // 마지막 페이지로 수정
+            // 리다이렉트가 필요한 경우에만 리다이렉트
+            return "redirect:/user/mywriting?page=" + totalPages + "&size=" + pageRequestDTO.getSize();
+        }
+
+        // 모델에 데이터 추가
+        model.addAttribute("posts", responseDTO.getDtoList()); // 게시글 리스트
+        model.addAttribute("currentUsername", username); // 사용자 이름
+        model.addAttribute("isAdmin", principal.getUser().getRole().equalsIgnoreCase("ADMIN")); // 관리자 여부
+        model.addAttribute("totalPages", totalPages); // 총 페이지 수
+        model.addAttribute("currentPage", pageRequestDTO.getPage()); // 현재 페이지 번호
+        model.addAttribute("pageSize", pageRequestDTO.getSize()); // 페이지 크기
+        model.addAttribute("baseUrl", "/user/mywriting"); // 페이징 URL
+
+        log.info("(내글보기,컨트롤러) 최종 PageRequestDTO: page={}, size={}", pageRequestDTO.getPage(), pageRequestDTO.getSize());
+
+        return "posting/list";
+    }
     /**
      * 특정 게시글의 상세 정보를 조회하고 뷰에 전달하는 메서드
      */
@@ -103,8 +182,8 @@ public class PostController {
         // 게시글 상세 정보 조회
         PostDTO postDTO = postService.readOne(postId);
         model.addAttribute("post", postDTO);
-        model.addAttribute("originalImages", postDTO.getOriginalImageLinks());
         model.addAttribute("isAuthor", true); // 작성자인 경우
+        model.addAttribute("originalImages", postDTO.getOriginalImageLinks());
 
         // 로그인한 사용자 정보 추가
         model.addAttribute("user", principal.getUser());

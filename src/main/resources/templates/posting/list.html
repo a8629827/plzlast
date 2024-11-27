@@ -137,7 +137,8 @@
       <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
 
         <!-- posts가 null이거나 비어있을 경우 처리 -->
-        <div th:if="${posts == null or #lists.isEmpty(posts)}" class="text-center">
+        <div th:if="${posts == null or #lists.isEmpty(posts)}"
+             class="text-center">
           <p>게시글이 없습니다.</p>
         </div>
 
@@ -170,11 +171,12 @@
                                 </span>
                             </span>
 
-                <!-- 작성자 본인 글 표시 -->
+                <!-- 작성자 배지 -->
                 <div th:if="${post.author == currentUsername}"
                      class="badge text-white position-absolute bottom-0 start-50 translate-middle-x mb-3">
                   내가 작성한 글
                 </div>
+
               </div>
             </div>
 
@@ -207,10 +209,8 @@
 
   <nav aria-label="Page navigation">
     <ul class="pagination justify-content-center">
-      <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:class="${currentPage == i} ? 'active'">
-        <a th:href="@{/posting/list(page=${i}, size=8, type=${type}, keyword=${keyword})}" class="page-link" th:text="${i}"></a>
-      </li>
-    </ul>
+      <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${currentPage == i} ? 'active'">
+        <a th:href="@{${baseUrl}(page=${i}, size=8)}" class="page-link" th:text="${i}"></a>    </ul>
   </nav>
 
   <!-- 신고하기 모달 -->

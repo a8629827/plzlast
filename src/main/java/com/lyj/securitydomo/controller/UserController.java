@@ -138,30 +138,12 @@ public class UserController {
         return "redirect:/user/logout"; // 로그아웃 후 메인 페이지로 이동
     }
 
-    /**
-     * 사용자가 작성한 게시글 목록 조회
-     * @param pageRequestDTO 페이지 요청 정보
-     * @param principal 로그인된 사용자 정보
-     * @param model 게시글 목록을 담을 모델
-     * @return 사용자 작성 게시글 목록 페이지
-     */
     @GetMapping("/mywriting")
-    public String myWritinglist(PageRequestDTO pageRequestDTO, @AuthenticationPrincipal PrincipalDetails principal, Model model) {
-        if (pageRequestDTO.getSize() <= 0) {
-            pageRequestDTO.setSize(10); // 기본값 설정
-        }
-
-        // 게시글 목록을 가져올 때, isVisible이 true인 게시글만 필터링
-        PageResponseDTO<PostDTO> responseDTO = postService.writinglist(pageRequestDTO, principal.getUser());
-
-        // 모델에 게시글을 추가하기 전에 로그 출력
-        log.info("게시글 목록 전달: {}", responseDTO.getDtoList());
-
-        model.addAttribute("myPosts", responseDTO.getDtoList()); // 게시글 DTO 리스트 추가
-        model.addAttribute("totalPages", (int) Math.ceil(responseDTO.getTotal() / (double) pageRequestDTO.getSize())); // 총 페이지 수 계산
-        model.addAttribute("currentPage", responseDTO.getPage()); //
-        model.addAttribute("user", principal.getUser());
-        return "/user/mywriting";
+    public String redirectToMyPosts(PageRequestDTO pageRequestDTO) {
+        // 쿼리 파라미터가 존재하는 경우 유지
+        String redirectUrl = String.format("redirect:/posting/user/mywriting?page=%d&size=%d",
+                pageRequestDTO.getPage(), pageRequestDTO.getSize());
+        return redirectUrl; // 리다이렉트 URL에 쿼리 파라미터 추가
     }
     /**
      * 게시글 읽기 및 수정 페이지를 보여주는 메서드

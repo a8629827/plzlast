@@ -108,12 +108,12 @@ public class PostServiceImpl implements PostService {
         if (post.getImageSet() != null && !post.getImageSet().isEmpty()) {
             // 파일이 있는 경우 첫 번째 이미지의 썸네일 링크 반환
             pPhoto firstImage = post.getImageSet().iterator().next();
-            log.info("썸네일 생성 - UUID: {}, FileName: {}", firstImage.getUuid(), firstImage.getFileName());
+            //log.info("썸네일 생성 - UUID: {}, FileName: {}", firstImage.getUuid(), firstImage.getFileName());
             return "/view/s_" + firstImage.getUuid() + "_" + firstImage.getFileName();
         }
         // 파일이 없는 경우 랜덤 이미지 반환
         String randomImage = UploadResultDTO.getRandomImage();
-        log.info("썸네일 생성 - 랜덤 이미지: {}", randomImage);
+        //log.info("썸네일 생성 - 랜덤 이미지: {}", randomImage);
         return randomImage;
     }
 
@@ -318,7 +318,7 @@ public class PostServiceImpl implements PostService {
         Boolean isVisible = isAdmin ? null : true;
         pageRequestDTO.setIsVisible(isVisible); // PageRequestDTO에도 필터 값을 반영
 
-        log.info("PostServiceImpl - 요청 처리 시작");
+        log.info("PostServiceImpl - 전체 글 보기 요청 처리 시작");
         log.info("사용자 타입 (관리자 여부): {}", isAdmin ? "관리자" : "일반 사용자");
         log.info("isVisible 필터: {}", isVisible);
 
@@ -347,18 +347,33 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public PageResponseDTO<PostDTO> writinglist(PageRequestDTO pageRequestDTO, User user) {
-        Pageable pageable = pageRequestDTO.getPageable("postId");
-        Page<Post> result = postRepository.findByUsername(user.getUsername(), pageable);
+    public PageResponseDTO<PostDTO> getPostsByUsername(String username, PageRequestDTO pageRequestDTO) {
+        Pageable pageable = pageRequestDTO.getPageable("createdAt"); // 최신순 정렬
 
+        log.info("(서비스) Pageable 생성 결과 - Page: {}, Size: {}", pageable.getPageNumber(), pageable.getPageSize());
+
+        log.info("(서비스)getPostsByUsername(내 글 보기) - 요청 처리 시작");
+        log.info("(서비스)Pageable 정보 - Page: {}, Size: {}", pageable.getPageNumber(), pageable.getPageSize());
+        log.info("(서비스)Username: {}", username);
+
+
+        // 작성자 이름으로 게시글 조회
+        Page<Post> result = postRepository.findByUsername(username, pageable);
+
+        log.info("레포지토리에서 반환된 게시글 개수: {}", result.getContent().size());
+        log.info("레포지토리에서 반환된 총 게시글 수: {}", result.getTotalElements());
+
+
+        // Post 엔티티 -> PostDTO 변환
         List<PostDTO> dtoList = result.getContent().stream()
-                .map(this::convertToDTO)
+                .map(this::convertToDTO) // 기존 convertToDTO 메서드 활용
                 .collect(Collectors.toList());
 
+        // PageResponseDTO 생성 및 반환
         return PageResponseDTO.<PostDTO>withAll()
-                .pageRequestDTO(pageRequestDTO)
-                .dtoList(dtoList)
-                .total((int) result.getTotalElements())
+                .pageRequestDTO(pageRequestDTO) // 요청 정보 포함
+                .dtoList(dtoList) // 변환된 DTO 리스트
+                .total((int) result.getTotalElements()) // 총 게시글 수
                 .build();
     }
     /**

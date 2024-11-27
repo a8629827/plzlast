@@ -25,6 +25,7 @@ public class PageRequestDTO {
     private String keyword; // 검색어
     private Boolean isVisible; // 게시글 공개 여부
 
+    private Long authorId; // 작성자 ID
     /**
      * 검색의 종류(type)를 쉼표(,)로 구분하여 배열로 반환
      *
@@ -81,6 +82,11 @@ public class PageRequestDTO {
             // isVisible 필드 추가
             if (isVisible != null) {
                 builder.append("&isVisible=").append(isVisible);
+            }
+
+            // authorId 필드 추가
+            if (authorId != null) {
+                builder.append("&authorId=").append(authorId);
             }
 
             link = builder.toString(); // 최종 링크 생성

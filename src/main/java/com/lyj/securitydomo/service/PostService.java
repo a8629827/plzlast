@@ -32,8 +32,8 @@ public interface PostService {
     // 게시글 공개 처리
     void makePostVisible(Long postId);
 
-    // 작성자가 쓴 게시글 목록
-    PageResponseDTO<PostDTO> writinglist(PageRequestDTO pageRequestDTO, User user);
+    // 작성자가 쓴 게시글 목록 (DTO 반환)
+    PageResponseDTO<PostDTO> getPostsByUsername(String username, PageRequestDTO pageRequestDTO);
 
 
 }
