@@ -96,8 +96,13 @@ public class PostController {
         // 작성자인지 여부를 화면에서 판단하기 위해 currentUsername 추가
         if (principal != null) {
             String currentUsername = principal.getUser().getUsername();
+            Long currentUserId = principal.getUser().getUserId(); // userId 가져오기
+
             model.addAttribute("currentUsername", currentUsername);
+            model.addAttribute("currentUserId", currentUserId);
+
             log.info("(컨트롤러) Current Username: {}", currentUsername);
+            log.info("(컨트롤러) Current User ID: {}", currentUserId);
 
         }
 
@@ -179,6 +184,9 @@ public class PostController {
     @GetMapping("/read/{postId}")
     public String read(@PathVariable Long postId, Model model,
                        @AuthenticationPrincipal PrincipalDetails principal) {
+        String currentUsername = principal.getUser().getUsername();
+        Long currentUserId = principal.getUser().getUserId(); // 추가된 userId 가져오기
+
         // 게시글 상세 정보 조회
         PostDTO postDTO = postService.readOne(postId);
         model.addAttribute("post", postDTO);
@@ -187,6 +195,8 @@ public class PostController {
 
         // 로그인한 사용자 정보 추가
         model.addAttribute("user", principal.getUser());
+        model.addAttribute("currentUsername", currentUsername); // 유지
+        model.addAttribute("currentUserId", currentUserId);     // 추가
 
         // 관리자 여부 확인
         boolean isAdmin = "ADMIN".equals(principal.getUser().getRole());
@@ -210,6 +220,8 @@ public class PostController {
         // 로그 출력
         log.info("게시글 상세 정보: {}", postDTO);
         log.info("isAdmin: {}, isAuthor: {}", isAdmin, isAuthor);
+        log.info("(컨트롤러) Current Username: {}", currentUsername);
+        log.info("(컨트롤러) Current User ID: {}", currentUserId);
 
         return "posting/read";
     }

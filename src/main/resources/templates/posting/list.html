@@ -125,6 +125,7 @@
         <p class="lead fw-normal text-white-50 mb-0">"당신 근처의 커뮤니티
           가까운 이웃과 함께 도움을 부탁해요!”</p>
       </div>
+
     </div>
   </header>
 
@@ -133,6 +134,7 @@
   <!-- 게시글 목록 섹션 -->
   <!-- 게시글 목록 섹션 -->
   <section class="py-5">
+
     <div class="container px-4 px-lg-5 mt-5">
       <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
 
@@ -180,14 +182,14 @@
               </div>
             </div>
 
-            <!-- 게시글 목록 카드 수정 -->
+            <!-- 게시글 목록 -->
             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
               <div class="text-center" th:attr="data-post-id=${post.postId}">
                 <!-- 신고 링크 -->
                 <a href="#" class="text-muted text-end position-absolute bottom-0 end-0 me-3 mb-3 d-flex align-items-center"
                    data-bs-toggle="modal"
                    data-bs-target="#reportModal"
-                   th:if="${!isAdmin and post.author != currentUsername}"
+                   th:if="${post.author != currentUsername}"
                    style="font-size: 0.875rem;">
                   <i class="bi bi-flag-fill me-1"></i> 신고
                 </a>
