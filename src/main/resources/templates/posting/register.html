@@ -7,15 +7,76 @@
   <meta charset="UTF-8">
   <title>게시글 등록</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu&display=swap" rel="stylesheet">
+
   <style>
+    /* 전체 폰트 및 배경 스타일 */
     body {
-      background-color: #f8f9fa;
+      font-family: 'Gaegu', sans-serif;
+      background-color: #b7dce8;
     }
 
+    /* 헤더 섹션 스타일 */
+    header {
+      background-color: #4c88cf; /* 헤더 색 */
+      color: white;
+    }
+
+
+
+    header h1 {
+      font-size: 2.5rem; /* 기존 크기 유지 */
+      font-weight: bold;
+    }
+
+    header p {
+      font-size: 1.2rem; /* 기존 크기 유지 */
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* 폼 필드 스타일 */
+    form .form-label {
+      font-weight: bold;
+    }
+
+    form .form-control {
+      border-radius: 8px;
+    }
+
+    form .form-control:focus {
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.25);
+    }
+
+    /* 지도 스타일 */
     #map {
-      width: 100%;
-      height: 400px; /* 지도 높이 설정 */
-      margin-top: 10px;
+      border: 2px solid #4a90e2;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      height: 400px;
+    }
+
+    /* 버튼 스타일 */
+    .btn-primary {
+      background-color: #4a90e2;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #3b7fc9;
+    }
+
+    /* 업로드 필드 스타일 */
+    #files {
+      border: 2px dashed #4a90e2;
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    #files:focus {
+      border-color: #3b7fc9;
     }
   </style>
   <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=9n21s23li1"></script>
@@ -24,7 +85,7 @@
 
 <body>
 <div layout:fragment="content">
-  <header class="bg-dark py-5">
+  <header class="py-5">
     <div class="container px-4 px-lg-5 my-5">
       <div class="text-center text-white">
         <h1 class="display-4 fw-bolder">게시글 등록</h1>
@@ -46,15 +107,15 @@
           <textarea class="form-control" id="contentText" name="contentText" rows="5" required></textarea>
         </div>
 
-        <div class="mb-3">
-          <label for="requiredParticipants" class="form-label">모집 인원</label>
-          <input type="number" class="form-control" id="requiredParticipants" name="requiredParticipants" min="1" required>
-        </div>
-
-        <div class="mb-3">
-          <label for="deadline" class="form-label">모집 마감일</label>
-          <input type="date" class="form-control" id="deadline" name="deadline"
-                 min="${T(java.time.LocalDate).now()}" required>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="requiredParticipants" class="form-label">모집 인원</label>
+            <input type="number" class="form-control" id="requiredParticipants" name="requiredParticipants" placeholder="모집 인원" min="1" required>
+          </div>
+          <div class="col-md-6">
+            <label for="deadline" class="form-label">모집 마감일</label>
+            <input type="date" class="form-control" id="deadline" name="deadline" min="${T(java.time.LocalDate).now()}" required>
+          </div>
         </div>
 
         <div>

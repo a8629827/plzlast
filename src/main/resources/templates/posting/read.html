@@ -684,6 +684,7 @@
 
         printReplies();
 
+
         // 댓글 등록 이벤트
         registerBtn.addEventListener('click', () => {
             const content = replyContent.value.trim();
@@ -739,6 +740,7 @@
                 });
             }
         });
+
         // 글자수 표시 함수
         function updateCharCount() {
             const contentLength = replyContent.value.length;
