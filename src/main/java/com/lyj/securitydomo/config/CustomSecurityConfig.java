@@ -50,7 +50,7 @@ public class CustomSecurityConfig {
                         .failureUrl("/user/login?error=true")  // 로그인 실패 시 URL
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout") // 로그아웃 처리 URL
+                        .logoutUrl("/user/logout") // 로그아웃 처리 URL
                         .logoutSuccessUrl("/") // 로그아웃 성공 시 이동할 경로
                         .invalidateHttpSession(true) // 세션 무효화
                         .clearAuthentication(true)); // 인증 정보 제거
